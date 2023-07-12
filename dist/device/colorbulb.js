@@ -417,6 +417,7 @@ class ColorBulb {
         this.infoLog(`BrightnessSet - value: ${value}`);
         this.brightnessDebounce = value;
         const debouncedEventListener = debounce(this.brightnessSetDebounceWrapper, 5000);
+        await this.updateHomeKitCharacteristics();
         debouncedEventListener(this);
     }
     async brightnessSetDebounceWrapper(_this) {
@@ -498,6 +499,7 @@ class ColorBulb {
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Brightness: ${this.Brightness}`);
         }
         else {
+            this.Brightness = this.brightnessDebounce;
             this.accessory.context.Brightness = this.Brightness;
             this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Brightness, this.Brightness);
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Brightness: ${this.Brightness}`);
