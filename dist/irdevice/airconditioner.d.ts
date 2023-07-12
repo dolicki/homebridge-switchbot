@@ -1,6 +1,6 @@
-import { SwitchBotPlatform } from '../platform';
-import { irDevicesConfig, irdevice } from '../settings';
-import { CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
+import { SwitchBotPlatform } from "../platform";
+import { irDevicesConfig, irdevice } from "../settings";
+import { CharacteristicValue, PlatformAccessory, Service } from "homebridge";
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers

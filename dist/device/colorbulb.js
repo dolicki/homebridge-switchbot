@@ -5,6 +5,17 @@ const undici_1 = require("undici");
 const utils_1 = require("../utils");
 const rxjs_1 = require("rxjs");
 const settings_1 = require("../settings");
+const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
@@ -18,6 +29,10 @@ class ColorBulb {
         // Connection
         this.BLE = this.device.connectionType === "BLE" || this.device.connectionType === "BLE/OpenAPI";
         this.OpenAPI = this.device.connectionType === "OpenAPI" || this.device.connectionType === "BLE/OpenAPI";
+        /**
+         * Handle requests to set the value of the "Brightness" characteristic
+         */
+        this.brightnessDebounce = 0;
         // default placeholders
         this.init(device, accessory, platform);
     }
@@ -391,9 +406,6 @@ class ColorBulb {
         this.On = value;
         await this.updateHomeKitCharacteristics();
     }
-    /**
-     * Handle requests to set the value of the "Brightness" characteristic
-     */
     async BrightnessSet(value) {
         // if (this.Brightness === this.accessory.context.Brightness) {
         //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No Changes, Set Brightness: ${value}`);
@@ -403,8 +415,12 @@ class ColorBulb {
         //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Set Brightness: ${value}`);
         // }
         this.infoLog(`BrightnessSet - value: ${value}`);
-        await this.pushBrightnessChanges(value);
-        this.Brightness = value;
+        this.brightnessDebounce = value;
+        debounce(this.brightnessSetDebounceWrapper, 5000);
+    }
+    async brightnessSetDebounceWrapper() {
+        await this.pushBrightnessChanges(this.brightnessDebounce);
+        this.Brightness = this.brightnessDebounce;
         await this.updateHomeKitCharacteristics();
     }
     /**

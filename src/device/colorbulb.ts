@@ -7,6 +7,20 @@ import { debounceTime, skipWhile, take, tap } from "rxjs/operators";
 import { device, devicesConfig, deviceStatus, switchbot, hs2rgb, rgb2hs, m2hs, serviceData, ad, Devices } from "../settings";
 import { Service, PlatformAccessory, CharacteristicValue, ControllerConstructor, Controller, ControllerServiceMap } from "homebridge";
 
+const debounce = (func, wait) => {
+  let timeout;
+
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
+
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
@@ -494,6 +508,7 @@ export class ColorBulb {
   /**
    * Handle requests to set the value of the "Brightness" characteristic
    */
+  brightnessDebounce: CharacteristicValue = 0;
   async BrightnessSet(value: CharacteristicValue): Promise<void> {
     // if (this.Brightness === this.accessory.context.Brightness) {
     //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No Changes, Set Brightness: ${value}`);
@@ -504,8 +519,14 @@ export class ColorBulb {
     // }
 
     this.infoLog(`BrightnessSet - value: ${value}`);
-    await this.pushBrightnessChanges(value);
-    this.Brightness = value;
+    this.brightnessDebounce = value;
+
+    debounce(this.brightnessSetDebounceWrapper, 5000);
+  }
+
+  async brightnessSetDebounceWrapper() {
+    await this.pushBrightnessChanges(this.brightnessDebounce);
+    this.Brightness = this.brightnessDebounce;
     await this.updateHomeKitCharacteristics();
   }
 
