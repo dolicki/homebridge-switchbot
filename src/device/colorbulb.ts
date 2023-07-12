@@ -301,37 +301,37 @@ export class ColorBulb {
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Brightness: ${this.Brightness}`);
 
     // Color, Hue & Brightness
-    if (this.color) {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} color: ${JSON.stringify(this.color)}`);
-      const [red, green, blue] = this.color!.split(":");
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} red: ${JSON.stringify(red)}`);
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} green: ${JSON.stringify(green)}`);
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} blue: ${JSON.stringify(blue)}`);
+    // if (this.color) {
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} color: ${JSON.stringify(this.color)}`);
+    //   const [red, green, blue] = this.color!.split(":");
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} red: ${JSON.stringify(red)}`);
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} green: ${JSON.stringify(green)}`);
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} blue: ${JSON.stringify(blue)}`);
 
-      const [hue, saturation] = rgb2hs(Number(red), Number(green), Number(blue));
-      this.debugLog(
-        `${this.device.deviceType}: ${this.accessory.displayName}` + ` hs: ${JSON.stringify(rgb2hs(Number(red), Number(green), Number(blue)))}`,
-      );
+    //   const [hue, saturation] = rgb2hs(Number(red), Number(green), Number(blue));
+    //   this.debugLog(
+    //     `${this.device.deviceType}: ${this.accessory.displayName}` + ` hs: ${JSON.stringify(rgb2hs(Number(red), Number(green), Number(blue)))}`,
+    //   );
 
-      // Hue
-      this.Hue = hue;
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${this.Hue}`);
+    //   // Hue
+    //   this.Hue = hue;
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${this.Hue}`);
 
-      // Saturation
-      this.Saturation = saturation;
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation: ${this.Saturation}`);
-    }
+    //   // Saturation
+    //   this.Saturation = saturation;
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation: ${this.Saturation}`);
+    // }
 
     // ColorTemperature
-    if (!Number.isNaN(this.colorTemperature)) {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} OpenAPI ColorTemperature: ${this.colorTemperature}`);
-      const mired = Math.round(1000000 / this.colorTemperature!);
+    // if (!Number.isNaN(this.colorTemperature)) {
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} OpenAPI ColorTemperature: ${this.colorTemperature}`);
+    //   const mired = Math.round(1000000 / this.colorTemperature!);
 
-      this.ColorTemperature = Number(mired);
+    //   this.ColorTemperature = Number(mired);
 
-      this.ColorTemperature = Math.max(Math.min(this.ColorTemperature, 500), 140);
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} ColorTemperature: ${this.ColorTemperature}`);
-    }
+    //   this.ColorTemperature = Math.max(Math.min(this.ColorTemperature, 500), 140);
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} ColorTemperature: ${this.ColorTemperature}`);
+    // }
   }
 
   /**
@@ -435,16 +435,16 @@ export class ColorBulb {
         headers: this.platform.generateHeaders(),
       });
       const deviceStatus = await body.json();
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
+      //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
       this.statusCode(statusCode);
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
+      //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} refreshStatus: ${JSON.stringify(deviceStatus)}`);
       this.power = deviceStatus.body.power;
       this.color = deviceStatus.body.color;
       this.brightness = deviceStatus.body.brightness;
       this.colorTemperature = deviceStatus.body.colorTemperature;
-      this.openAPIparseStatus();
-      this.updateHomeKitCharacteristics();
+      await this.openAPIparseStatus();
+      await this.updateHomeKitCharacteristics();
     } catch (e: any) {
       this.apiError(e);
       this.errorLog(
@@ -693,20 +693,25 @@ export class ColorBulb {
     }
   }
 
-  private async pushOnOffCommand() {
+  private async pushOnOffCommand(value: CharacteristicValue) {
+    if (this.On == value) {
+      return;
+    }
+
     let command = "";
     if (this.On) {
       command = "turnOn";
     } else {
       command = "turnOff";
     }
+    this.On = value;
     const bodyChange = JSON.stringify({
       command: `${command}`,
       parameter: "default",
       commandType: "command",
     });
-    this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
-    this.debugLog("Goran: ligthbulb");
+    //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
+    //this.debugLog("Goran: ligthbulb");
     try {
       const { body, statusCode, headers } = await request(`${Devices}/${this.device.deviceId}/commands`, {
         body: bodyChange,
@@ -714,9 +719,9 @@ export class ColorBulb {
         headers: this.platform.generateHeaders(),
       });
       const deviceStatus = await body.json();
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
+      //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
       this.statusCode(statusCode);
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
+      //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
     } catch (e: any) {
       this.apiError(e);
       this.errorLog(
@@ -846,7 +851,7 @@ export class ColorBulb {
     }
 
     this.On = value;
-    await this.pushOnOffCommand();
+    await this.pushOnOffCommand(value);
     //this.doColorBulbUpdate.next();
   }
 
