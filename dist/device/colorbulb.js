@@ -33,7 +33,7 @@ class ColorBulb {
          * Handle requests to set the value of the "Brightness" characteristic
          */
         this.brightnessDebounce = 0;
-        this.brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper, 350);
+        this.brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper, 250);
         // default placeholders
         this.init(device, accessory, platform);
     }
@@ -422,9 +422,10 @@ class ColorBulb {
         await this.brightnessDebounceHandler(this);
     }
     async brightnessSetDebounceWrapper(object) {
+        await object.updateHomeKitCharacteristics();
+        this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} API CALL: ${object.brightnessDebounce}`);
         await object.pushBrightnessChanges(object.brightnessDebounce);
         object.Brightness = object.brightnessDebounce;
-        await object.updateHomeKitCharacteristics();
     }
     /**
      * Handle requests to set the value of the "ColorTemperature" characteristic

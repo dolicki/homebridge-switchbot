@@ -510,7 +510,7 @@ export class ColorBulb {
    * Handle requests to set the value of the "Brightness" characteristic
    */
   brightnessDebounce: CharacteristicValue = 0;
-  brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper, 350);
+  brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper, 250);
 
   async BrightnessSet(value: CharacteristicValue): Promise<void> {
     // if (this.Brightness === this.accessory.context.Brightness) {
@@ -527,10 +527,11 @@ export class ColorBulb {
     await this.brightnessDebounceHandler(this);
   }
 
-  async brightnessSetDebounceWrapper(object) {
+  async brightnessSetDebounceWrapper(object: this) {
+    await object.updateHomeKitCharacteristics();
+    this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} API CALL: ${object.brightnessDebounce}`);
     await object.pushBrightnessChanges(object.brightnessDebounce);
     object.Brightness = object.brightnessDebounce;
-    await object.updateHomeKitCharacteristics();
   }
 
   /**
