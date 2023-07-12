@@ -710,11 +710,11 @@ export class ColorBulb {
     // }
     // Push Hue & Saturation Update
     if (this.On) {
-      await this.pushHueSaturationChanges();
+      // await this.pushHueSaturationChanges();
     }
     // Push ColorTemperature Update
     if (this.On) {
-      await this.pushColorTemperatureChanges();
+      // await this.pushColorTemperatureChanges();
     }
     // Push Brightness Update
     if (this.On) {
@@ -889,7 +889,7 @@ export class ColorBulb {
     this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Saturation, hs[1]);
 
     this.ColorTemperature = value;
-    this.doColorBulbUpdate.next();
+    //this.doColorBulbUpdate.next();
   }
 
   /**
@@ -907,7 +907,7 @@ export class ColorBulb {
     this.lightBulbService.updateCharacteristic(this.platform.Characteristic.ColorTemperature, 140);
 
     this.Hue = value;
-    this.doColorBulbUpdate.next();
+    //this.doColorBulbUpdate.next();
   }
 
   /**
@@ -925,7 +925,7 @@ export class ColorBulb {
     this.lightBulbService.updateCharacteristic(this.platform.Characteristic.ColorTemperature, 140);
 
     this.Saturation = value;
-    this.doColorBulbUpdate.next();
+    //this.doColorBulbUpdate.next();
   }
 
   async updateHomeKitCharacteristics(): Promise<void> {
