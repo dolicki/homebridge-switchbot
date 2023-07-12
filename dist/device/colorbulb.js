@@ -423,7 +423,7 @@ class ColorBulb {
     }
     async brightnessSetDebounceWrapper(object) {
         await object.updateHomeKitCharacteristics();
-        this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} API CALL: ${object.brightnessDebounce}`);
+        object.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} API CALL: ${object.brightnessDebounce}`);
         await object.pushBrightnessChanges(object.brightnessDebounce);
         object.Brightness = object.brightnessDebounce;
     }
