@@ -421,7 +421,7 @@ class ColorBulb {
     }
     async brightnessSetDebounceWrapper(_this) {
         await _this.pushBrightnessChanges(_this.brightnessDebounce);
-        this.Brightness = this.brightnessDebounce;
+        _this.Brightness = _this.brightnessDebounce;
         await _this.updateHomeKitCharacteristics();
     }
     /**
