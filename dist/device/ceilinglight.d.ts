@@ -1,9 +1,9 @@
 /// <reference types="node" />
-import { Context } from 'vm';
-import { Subject } from 'rxjs';
-import { SwitchBotPlatform } from '../platform';
-import { device, devicesConfig, deviceStatus, switchbot, serviceData, ad } from '../settings';
-import { Service, PlatformAccessory, CharacteristicValue, ControllerConstructor, Controller, ControllerServiceMap } from 'homebridge';
+import { Context } from "vm";
+import { Subject } from "rxjs";
+import { SwitchBotPlatform } from "../platform";
+import { device, devicesConfig, deviceStatus, switchbot, serviceData, ad } from "../settings";
+import { Service, PlatformAccessory, CharacteristicValue, ControllerConstructor, Controller, ControllerServiceMap } from "homebridge";
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
@@ -19,18 +19,18 @@ export declare class CeilingLight {
     Saturation: CharacteristicValue;
     Brightness: CharacteristicValue;
     ColorTemperature?: CharacteristicValue;
-    power: deviceStatus['power'];
-    color: deviceStatus['color'];
-    brightness: deviceStatus['brightness'];
-    colorTemperature?: deviceStatus['colorTemperature'];
+    power: deviceStatus["power"];
+    color: deviceStatus["color"];
+    brightness: deviceStatus["brightness"];
+    colorTemperature?: deviceStatus["colorTemperature"];
     deviceStatus: any;
     connected?: boolean;
     switchbot: switchbot;
-    address: ad['address'];
+    address: ad["address"];
     serviceData: serviceData;
-    state: serviceData['state'];
-    delay: serviceData['delay'];
-    wifiRssi: serviceData['wifiRssi'];
+    state: serviceData["state"];
+    delay: serviceData["delay"];
+    wifiRssi: serviceData["wifiRssi"];
     set_minStep?: number;
     scanDuration: number;
     deviceLogging: string;

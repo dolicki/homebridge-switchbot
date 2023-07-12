@@ -566,6 +566,7 @@ class ColorBulb {
             commandType: "command",
         });
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
+        this.debugLog("Goran: ligthbulb");
         try {
             const { body, statusCode, headers } = await (0, undici_1.request)(`${settings_1.Devices}/${this.device.deviceId}/commands`, {
                 body: bodyChange,
