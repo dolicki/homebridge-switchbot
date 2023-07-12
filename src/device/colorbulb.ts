@@ -283,6 +283,7 @@ export class ColorBulb {
 
     // Brightness
     this.Brightness = Number(this.brightness);
+    this.brightnessDebounce = this.Brightness;
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Brightness: ${this.Brightness}`);
 
     // Color, Hue & Brightness
