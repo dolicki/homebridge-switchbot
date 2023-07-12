@@ -62,10 +62,6 @@ export declare class ColorBulb {
     parseStatus(): Promise<void>;
     BLEparseStatus(): Promise<void>;
     openAPIparseStatus(): Promise<void>;
-    /**
-     * Asks the SwitchBot API for the latest device information
-     */
-    BLERefreshStatus(): Promise<void>;
     openAPIRefreshStatus(): Promise<void>;
     /**
      * Pushes the requested changes to the SwitchBot API
@@ -78,16 +74,10 @@ export declare class ColorBulb {
      * Color Bulb   -    "command"     "setColorTemperature"	         "{2700-6500}"	            =        set color temperature
      *
      */
-    pushChanges(): Promise<void>;
-    BLEpushChanges(): Promise<void>;
-    BLEpushBrightnessChanges(): Promise<void>;
-    BLEpushColorTemperatureChanges(): Promise<void>;
-    BLEpushRGBChanges(): Promise<void>;
-    openAPIpushChanges(): Promise<void>;
     private pushOnOffCommand;
     pushHueSaturationChanges(): Promise<void>;
     pushColorTemperatureChanges(): Promise<void>;
-    pushBrightnessChanges(): Promise<void>;
+    pushBrightnessChanges(value: CharacteristicValue): Promise<void>;
     /**
      * Handle requests to set the value of the "On" characteristic
      */
@@ -110,10 +100,6 @@ export declare class ColorBulb {
     SaturationSet(value: CharacteristicValue): Promise<void>;
     updateHomeKitCharacteristics(): Promise<void>;
     adaptiveLighting(device: device & devicesConfig): Promise<void>;
-    stopScanning(switchbot: any): Promise<void>;
-    getCustomBLEAddress(switchbot: any): Promise<void>;
-    BLEPushConnection(): Promise<void>;
-    BLERefreshConnection(switchbot: any): Promise<void>;
     retry({ max, fn }: {
         max: number;
         fn: {
@@ -123,7 +109,6 @@ export declare class ColorBulb {
     }): Promise<null>;
     maxRetry(): number;
     minStep(device: device & devicesConfig): number;
-    scan(device: device & devicesConfig): Promise<void>;
     statusCode(statusCode: number): Promise<void>;
     offlineOff(): Promise<void>;
     apiError(e: any): void;
