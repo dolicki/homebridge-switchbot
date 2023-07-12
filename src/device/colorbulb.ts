@@ -74,22 +74,22 @@ export class ColorBulb {
 
   constructor(private readonly platform: SwitchBotPlatform, private accessory: PlatformAccessory, public device: device & devicesConfig) {
     // default placeholders
-    this.logs(device);
-    this.scan(device);
-    this.refreshRate(device);
-    this.adaptiveLighting(device);
-    this.config(device);
-    this.context();
+    this.init(device, accessory, platform);
+  }
+
+  private async init(device: device & devicesConfig, accessory, platform: SwitchBotPlatform) {
+    await this.logs(device);
+    await this.scan(device);
+    await this.refreshRate(device);
+    await this.adaptiveLighting(device);
+    await this.config(device);
+    await this.context();
     // this is subject we use to track when we need to POST changes to the SwitchBot API
     this.doColorBulbUpdate = new Subject();
     this.colorBulbUpdateInProgress = false;
 
     // Retrieve initial values and updateHomekit
     //this.refreshStatus();
-    setInterval(() => {
-      this.openAPIRefreshStatus();
-    }, 60 * 1000);
-
     // set accessory information
     accessory
       .getService(this.platform.Service.AccessoryInformation)!
@@ -112,10 +112,14 @@ export class ColorBulb {
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} adaptiveLighting: ${this.accessory.context.adaptiveLighting}`);
     }
 
+    await this.openAPIRefreshStatus();
+    // setInterval(() => {
+    //   this.openAPIRefreshStatus();
+    // }, 60 * 1000);
+
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
     // accessory.getService('NAME') ?? accessory.addService(this.platform.Service.Outlet, 'NAME', 'USER_DEFINED_SUBTYPE');
-
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
     this.lightBulbService.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
@@ -152,7 +156,6 @@ export class ColorBulb {
     //     return this.ColorTemperature!;
     //   })
     //   .onSet(this.ColorTemperatureSet.bind(this));
-
     // // handle Hue events using the Hue characteristic
     // this.lightBulbService
     //   .getCharacteristic(this.platform.Characteristic.Hue)
@@ -165,7 +168,6 @@ export class ColorBulb {
     //     return this.Hue;
     //   })
     //   .onSet(this.HueSet.bind(this));
-
     // // handle Hue events using the Hue characteristic
     // this.lightBulbService
     //   .getCharacteristic(this.platform.Characteristic.Saturation)
@@ -178,7 +180,6 @@ export class ColorBulb {
     //     return this.Saturation;
     //   })
     //   .onSet(this.SaturationSet.bind(this));
-
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} adaptiveLightingShift: ${this.adaptiveLightingShift}`);
     if (this.adaptiveLightingShift !== -1) {
       this.AdaptiveLightingController = new platform.api.hap.AdaptiveLightingController(this.lightBulbService, {
@@ -423,7 +424,6 @@ export class ColorBulb {
           ` Connection, Error Message: ${JSON.stringify(e.message)}`,
       );
     }
-    await this.updateHomeKitCharacteristics();
   }
 
   /**
@@ -666,17 +666,18 @@ export class ColorBulb {
   }
 
   private async pushOnOffCommand(value: CharacteristicValue) {
+    this.debugLog(`this.On: ${this.On} == value: ${value}`);
     if (this.On == value) {
       return;
     }
 
     let command = "";
-    if (this.On) {
+    if (value) {
       command = "turnOn";
     } else {
       command = "turnOff";
     }
-    this.On = value;
+
     const bodyChange = JSON.stringify({
       command: `${command}`,
       parameter: "default",
@@ -816,13 +817,16 @@ export class ColorBulb {
    * Handle requests to set the value of the "On" characteristic
    */
   async OnSet(value: CharacteristicValue): Promise<void> {
-    if (this.On === value) {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No Changes, Set On: ${value}`);
-    } else {
-      this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set On: ${value}`);
-    }
+    // if (this.On === value) {
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No Changes, Set On: ${value}`);
+    // } else {
+    //   this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set On: ${value}`);
+    // }
 
+    this.infoLog(`OnSet - value: ${value}`);
     await this.pushOnOffCommand(value);
+    await this.updateHomeKitCharacteristics();
+    this.On = value;
     //this.doColorBulbUpdate.next();
   }
 

@@ -55,6 +55,7 @@ export declare class ColorBulb {
     private readonly BLE;
     private readonly OpenAPI;
     constructor(platform: SwitchBotPlatform, accessory: PlatformAccessory, device: device & devicesConfig);
+    private init;
     /**
      * Parse the device status from the SwitchBot api
      */
