@@ -702,8 +702,8 @@ class ColorBulb {
         // }
         this.infoLog(`OnSet - value: ${value}`);
         await this.pushOnOffCommand(value);
-        await this.updateHomeKitCharacteristics();
         this.On = value;
+        await this.updateHomeKitCharacteristics();
         //this.doColorBulbUpdate.next();
     }
     /**
