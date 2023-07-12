@@ -528,9 +528,9 @@ export class ColorBulb {
   }
 
   async brightnessSetDebounceWrapper(object: this, value) {
-    await object.updateHomeKitCharacteristics();
+    object.updateHomeKitCharacteristics();
     console.log(`BULB API CALL: ${value}`);
-    await object.pushBrightnessChanges(value);
+    object.pushBrightnessChanges(value);
   }
 
   /**
