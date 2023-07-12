@@ -138,43 +138,43 @@ export class ColorBulb {
       .onSet(this.BrightnessSet.bind(this));
 
     // handle ColorTemperature events using the ColorTemperature characteristic
-    this.lightBulbService
-      .getCharacteristic(this.platform.Characteristic.ColorTemperature)
-      .setProps({
-        minValue: 140,
-        maxValue: 500,
-        validValueRanges: [140, 500],
-      })
-      .onGet(() => {
-        return this.ColorTemperature!;
-      })
-      .onSet(this.ColorTemperatureSet.bind(this));
+    // this.lightBulbService
+    //   .getCharacteristic(this.platform.Characteristic.ColorTemperature)
+    //   .setProps({
+    //     minValue: 140,
+    //     maxValue: 500,
+    //     validValueRanges: [140, 500],
+    //   })
+    //   .onGet(() => {
+    //     return this.ColorTemperature!;
+    //   })
+    //   .onSet(this.ColorTemperatureSet.bind(this));
 
-    // handle Hue events using the Hue characteristic
-    this.lightBulbService
-      .getCharacteristic(this.platform.Characteristic.Hue)
-      .setProps({
-        minValue: 0,
-        maxValue: 360,
-        validValueRanges: [0, 360],
-      })
-      .onGet(() => {
-        return this.Hue;
-      })
-      .onSet(this.HueSet.bind(this));
+    // // handle Hue events using the Hue characteristic
+    // this.lightBulbService
+    //   .getCharacteristic(this.platform.Characteristic.Hue)
+    //   .setProps({
+    //     minValue: 0,
+    //     maxValue: 360,
+    //     validValueRanges: [0, 360],
+    //   })
+    //   .onGet(() => {
+    //     return this.Hue;
+    //   })
+    //   .onSet(this.HueSet.bind(this));
 
-    // handle Hue events using the Hue characteristic
-    this.lightBulbService
-      .getCharacteristic(this.platform.Characteristic.Saturation)
-      .setProps({
-        minValue: 0,
-        maxValue: 100,
-        validValueRanges: [0, 100],
-      })
-      .onGet(() => {
-        return this.Saturation;
-      })
-      .onSet(this.SaturationSet.bind(this));
+    // // handle Hue events using the Hue characteristic
+    // this.lightBulbService
+    //   .getCharacteristic(this.platform.Characteristic.Saturation)
+    //   .setProps({
+    //     minValue: 0,
+    //     maxValue: 100,
+    //     validValueRanges: [0, 100],
+    //   })
+    //   .onGet(() => {
+    //     return this.Saturation;
+    //   })
+    //   .onSet(this.SaturationSet.bind(this));
 
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} adaptiveLightingShift: ${this.adaptiveLightingShift}`);
     if (this.adaptiveLightingShift !== -1) {
@@ -943,37 +943,38 @@ export class ColorBulb {
       this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Brightness, this.Brightness);
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Brightness: ${this.Brightness}`);
     }
-    if (this.ColorTemperature === undefined) {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} ColorTemperature: ${this.ColorTemperature}`);
-    } else {
-      this.accessory.context.ColorTemperature = this.ColorTemperature;
-      this.lightBulbService.updateCharacteristic(this.platform.Characteristic.ColorTemperature, this.ColorTemperature);
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic ColorTemperature: ${this.ColorTemperature}`);
-    }
-    if (this.Hue === undefined) {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${this.Hue}`);
-    } else {
-      this.accessory.context.Hue = this.Hue;
-      this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Hue, this.Hue);
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Hue: ${this.Hue}`);
-    }
-    if (this.Saturation === undefined) {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation: ${this.Saturation}`);
-    } else {
-      this.accessory.context.Saturation = this.Saturation;
-      this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Saturation, this.Saturation);
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Saturation: ${this.Saturation}`);
-    }
+    // if (this.ColorTemperature === undefined) {
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} ColorTemperature: ${this.ColorTemperature}`);
+    // } else {
+    //   this.accessory.context.ColorTemperature = this.ColorTemperature;
+    //   this.lightBulbService.updateCharacteristic(this.platform.Characteristic.ColorTemperature, this.ColorTemperature);
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic ColorTemperature: ${this.ColorTemperature}`);
+    // }
+    // if (this.Hue === undefined) {
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${this.Hue}`);
+    // } else {
+    //   this.accessory.context.Hue = this.Hue;
+    //   this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Hue, this.Hue);
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Hue: ${this.Hue}`);
+    // }
+    // if (this.Saturation === undefined) {
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation: ${this.Saturation}`);
+    // } else {
+    //   this.accessory.context.Saturation = this.Saturation;
+    //   this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Saturation, this.Saturation);
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Saturation: ${this.Saturation}`);
+    // }
   }
 
   async adaptiveLighting(device: device & devicesConfig): Promise<void> {
-    if (device.colorbulb?.adaptiveLightingShift) {
-      this.adaptiveLightingShift = device.colorbulb.adaptiveLightingShift;
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} adaptiveLightingShift: ${this.adaptiveLightingShift}`);
-    } else {
-      this.adaptiveLightingShift = 0;
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} adaptiveLightingShift: ${this.adaptiveLightingShift}`);
-    }
+    // if (device.colorbulb?.adaptiveLightingShift) {
+    //   this.adaptiveLightingShift = device.colorbulb.adaptiveLightingShift;
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} adaptiveLightingShift: ${this.adaptiveLightingShift}`);
+    // } else {
+    //   this.adaptiveLightingShift = 0;
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} adaptiveLightingShift: ${this.adaptiveLightingShift}`);
+    // }
+    this.adaptiveLightingShift = 0;
   }
 
   async stopScanning(switchbot: any) {
