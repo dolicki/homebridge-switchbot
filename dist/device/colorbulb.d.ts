@@ -86,9 +86,9 @@ export declare class ColorBulb {
      * Handle requests to set the value of the "Brightness" characteristic
      */
     brightnessDebounce: CharacteristicValue;
-    handler: (...args: any[]) => void;
+    brightnessDebounceHandler: (...args: any[]) => void;
     BrightnessSet(value: CharacteristicValue): Promise<void>;
-    brightnessSetDebounceWrapper(_this: any): Promise<void>;
+    brightnessSetDebounceWrapper(object: any): Promise<void>;
     /**
      * Handle requests to set the value of the "ColorTemperature" characteristic
      */

@@ -33,7 +33,7 @@ class ColorBulb {
          * Handle requests to set the value of the "Brightness" characteristic
          */
         this.brightnessDebounce = 0;
-        this.handler = debounce(this.brightnessSetDebounceWrapper, 2000);
+        this.brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper, 350);
         // default placeholders
         this.init(device, accessory, platform);
     }
@@ -418,12 +418,13 @@ class ColorBulb {
         // }
         this.infoLog(`BrightnessSet - value: ${value}`);
         this.brightnessDebounce = value;
-        await this.handler(this);
+        await this.updateHomeKitCharacteristics();
+        await this.brightnessDebounceHandler(this);
     }
-    async brightnessSetDebounceWrapper(_this) {
-        await _this.pushBrightnessChanges(_this.brightnessDebounce);
-        _this.Brightness = _this.brightnessDebounce;
-        await _this.updateHomeKitCharacteristics();
+    async brightnessSetDebounceWrapper(object) {
+        await object.pushBrightnessChanges(object.brightnessDebounce);
+        object.Brightness = object.brightnessDebounce;
+        await object.updateHomeKitCharacteristics();
     }
     /**
      * Handle requests to set the value of the "ColorTemperature" characteristic
