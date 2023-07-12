@@ -85,7 +85,10 @@ export class ColorBulb {
     this.colorBulbUpdateInProgress = false;
 
     // Retrieve initial values and updateHomekit
-    this.refreshStatus();
+    //this.refreshStatus();
+    setInterval(() => {
+      this.openAPIRefreshStatus();
+    }, 60 * 1000);
 
     // set accessory information
     accessory
@@ -188,38 +191,6 @@ export class ColorBulb {
           ` adaptiveLightingShift: ${this.adaptiveLightingShift}`,
       );
     }
-
-    // Update Homekit
-    this.updateHomeKitCharacteristics();
-
-    // Start an update interval
-    interval(this.deviceRefreshRate * 1000)
-      .pipe(skipWhile(() => this.colorBulbUpdateInProgress))
-      .subscribe(async () => {
-        await this.refreshStatus();
-      });
-
-    // Watch for Bulb change events
-    // We put in a debounce of 100ms so we don't make duplicate calls
-    this.doColorBulbUpdate
-      .pipe(
-        tap(() => {
-          this.colorBulbUpdateInProgress = true;
-        }),
-        //debounceTime(this.platform.config.options!.pushRate! * 1000),
-      )
-      .subscribe(async () => {
-        try {
-          await this.pushChanges();
-        } catch (e: any) {
-          this.apiError(e);
-          this.errorLog(
-            `${this.device.deviceType}: ${this.accessory.displayName} failed pushChanges with ${this.device.connectionType} Connection,` +
-              ` Error Message: ${JSON.stringify(e.message)}`,
-          );
-        }
-        this.colorBulbUpdateInProgress = false;
-      });
   }
 
   /**
@@ -452,6 +423,7 @@ export class ColorBulb {
           ` Connection, Error Message: ${JSON.stringify(e.message)}`,
       );
     }
+    await this.updateHomeKitCharacteristics();
   }
 
   /**

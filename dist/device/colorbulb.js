@@ -30,7 +30,10 @@ class ColorBulb {
         this.doColorBulbUpdate = new rxjs_1.Subject();
         this.colorBulbUpdateInProgress = false;
         // Retrieve initial values and updateHomekit
-        this.refreshStatus();
+        //this.refreshStatus();
+        setInterval(() => {
+            this.openAPIRefreshStatus();
+        }, 60 * 1000);
         // set accessory information
         accessory
             .getService(this.platform.Service.AccessoryInformation)
@@ -120,31 +123,6 @@ class ColorBulb {
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} adaptiveLighting: ${this.accessory.context.adaptiveLighting},` +
                 ` adaptiveLightingShift: ${this.adaptiveLightingShift}`);
         }
-        // Update Homekit
-        this.updateHomeKitCharacteristics();
-        // Start an update interval
-        (0, rxjs_1.interval)(this.deviceRefreshRate * 1000)
-            .pipe((0, operators_1.skipWhile)(() => this.colorBulbUpdateInProgress))
-            .subscribe(async () => {
-            await this.refreshStatus();
-        });
-        // Watch for Bulb change events
-        // We put in a debounce of 100ms so we don't make duplicate calls
-        this.doColorBulbUpdate
-            .pipe((0, operators_1.tap)(() => {
-            this.colorBulbUpdateInProgress = true;
-        }))
-            .subscribe(async () => {
-            try {
-                await this.pushChanges();
-            }
-            catch (e) {
-                this.apiError(e);
-                this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed pushChanges with ${this.device.connectionType} Connection,` +
-                    ` Error Message: ${JSON.stringify(e.message)}`);
-            }
-            this.colorBulbUpdateInProgress = false;
-        });
     }
     /**
      * Parse the device status from the SwitchBot api
@@ -352,6 +330,7 @@ class ColorBulb {
             this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed openAPIRefreshStatus with ${this.device.connectionType}` +
                 ` Connection, Error Message: ${JSON.stringify(e.message)}`);
         }
+        await this.updateHomeKitCharacteristics();
     }
     /**
      * Pushes the requested changes to the SwitchBot API
