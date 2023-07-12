@@ -1,11 +1,11 @@
-import { Context } from 'vm';
-import { request } from 'undici';
-import { sleep } from '../utils';
-import { interval, Subject } from 'rxjs';
-import { SwitchBotPlatform } from '../platform';
-import { debounceTime, skipWhile, take, tap } from 'rxjs/operators';
-import { device, devicesConfig, deviceStatus, switchbot, hs2rgb, rgb2hs, m2hs, serviceData, ad, Devices } from '../settings';
-import { Service, PlatformAccessory, CharacteristicValue, ControllerConstructor, Controller, ControllerServiceMap } from 'homebridge';
+import { Context } from "vm";
+import { request } from "undici";
+import { sleep } from "../utils";
+import { interval, Subject } from "rxjs";
+import { SwitchBotPlatform } from "../platform";
+import { debounceTime, skipWhile, take, tap } from "rxjs/operators";
+import { device, devicesConfig, deviceStatus, switchbot, hs2rgb, rgb2hs, m2hs, serviceData, ad, Devices } from "../settings";
+import { Service, PlatformAccessory, CharacteristicValue, ControllerConstructor, Controller, ControllerServiceMap } from "homebridge";
 
 /**
  * Platform Accessory
@@ -24,30 +24,30 @@ export class ColorBulb {
   ColorTemperature?: CharacteristicValue;
 
   // OpenAPI Others
-  power: deviceStatus['power'];
-  color: deviceStatus['color'];
-  brightness: deviceStatus['brightness'];
-  colorTemperature?: deviceStatus['colorTemperature'];
+  power: deviceStatus["power"];
+  color: deviceStatus["color"];
+  brightness: deviceStatus["brightness"];
+  colorTemperature?: deviceStatus["colorTemperature"];
   deviceStatus!: any;
 
   // BLE Others
   connected?: boolean;
   switchbot!: switchbot;
-  address!: ad['address'];
+  address!: ad["address"];
   serviceData!: serviceData;
-  powerState: serviceData['power'];
-  state: serviceData['state'];
-  red: serviceData['red'];
-  green: serviceData['green'];
-  blue: serviceData['blue'];
-  delay: serviceData['delay'];
-  wifiRssi: serviceData['wifiRssi'];
-  brightnessBLE: serviceData['brightness'];
-  color_temperature: serviceData['color_temperature'];
-  preset: any;//serviceData['preset'];
-  color_mode: any;//serviceData['color_mode'];
-  speed: any;//serviceData['speed'];
-  loop_index: any;//serviceData['loop_index'];
+  powerState: serviceData["power"];
+  state: serviceData["state"];
+  red: serviceData["red"];
+  green: serviceData["green"];
+  blue: serviceData["blue"];
+  delay: serviceData["delay"];
+  wifiRssi: serviceData["wifiRssi"];
+  brightnessBLE: serviceData["brightness"];
+  color_temperature: serviceData["color_temperature"];
+  preset: any; //serviceData['preset'];
+  color_mode: any; //serviceData['color_mode'];
+  speed: any; //serviceData['speed'];
+  loop_index: any; //serviceData['loop_index'];
 
   // Config
   set_minStep?: number;
@@ -69,8 +69,8 @@ export class ColorBulb {
   doColorBulbUpdate!: Subject<void>;
 
   // Connection
-  private readonly BLE = (this.device.connectionType === 'BLE' || this.device.connectionType === 'BLE/OpenAPI');
-  private readonly OpenAPI = (this.device.connectionType === 'OpenAPI' || this.device.connectionType === 'BLE/OpenAPI');
+  private readonly BLE = this.device.connectionType === "BLE" || this.device.connectionType === "BLE/OpenAPI";
+  private readonly OpenAPI = this.device.connectionType === "OpenAPI" || this.device.connectionType === "BLE/OpenAPI";
 
   constructor(private readonly platform: SwitchBotPlatform, private accessory: PlatformAccessory, public device: device & devicesConfig) {
     // default placeholders
@@ -90,8 +90,8 @@ export class ColorBulb {
     // set accessory information
     accessory
       .getService(this.platform.Service.AccessoryInformation)!
-      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'SwitchBot')
-      .setCharacteristic(this.platform.Characteristic.Model, 'W1401400')
+      .setCharacteristic(this.platform.Characteristic.Manufacturer, "SwitchBot")
+      .setCharacteristic(this.platform.Characteristic.Model, "W1401400")
       .setCharacteristic(this.platform.Characteristic.SerialNumber, device.deviceId!)
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.FirmwareRevision(accessory, device))
       .getCharacteristic(this.platform.Characteristic.FirmwareRevision)
@@ -100,7 +100,7 @@ export class ColorBulb {
     // get the Lightbulb service if it exists, otherwise create a new Lightbulb service
     // you can create multiple services for each accessory
     (this.lightBulbService = accessory.getService(this.platform.Service.Lightbulb) || accessory.addService(this.platform.Service.Lightbulb)),
-    `${accessory.displayName} ${device.deviceType}`;
+      `${accessory.displayName} ${device.deviceType}`;
 
     if (this.adaptiveLightingShift === -1 && this.accessory.context.adaptiveLighting) {
       this.accessory.removeService(this.lightBulbService);
@@ -185,7 +185,7 @@ export class ColorBulb {
       this.accessory.context.adaptiveLighting = true;
       this.debugLog(
         `${this.device.deviceType}: ${this.accessory.displayName} adaptiveLighting: ${this.accessory.context.adaptiveLighting},` +
-        ` adaptiveLightingShift: ${this.adaptiveLightingShift}`,
+          ` adaptiveLightingShift: ${this.adaptiveLightingShift}`,
       );
     }
 
@@ -213,8 +213,10 @@ export class ColorBulb {
           await this.pushChanges();
         } catch (e: any) {
           this.apiError(e);
-          this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed pushChanges with ${this.device.connectionType} Connection,`
-            + ` Error Message: ${JSON.stringify(e.message)}`);
+          this.errorLog(
+            `${this.device.deviceType}: ${this.accessory.displayName} failed pushChanges with ${this.device.connectionType} Connection,` +
+              ` Error Message: ${JSON.stringify(e.message)}`,
+          );
         }
         this.colorBulbUpdateInProgress = false;
       });
@@ -232,8 +234,9 @@ export class ColorBulb {
       await this.openAPIparseStatus();
     } else {
       await this.offlineOff();
-      this.debugWarnLog(`${this.device.deviceType}: ${this.accessory.displayName} Connection Type:`
-        + ` ${this.device.connectionType}, parseStatus will not happen.`);
+      this.debugWarnLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} Connection Type:` + ` ${this.device.connectionType}, parseStatus will not happen.`,
+      );
     }
   }
 
@@ -249,7 +252,6 @@ export class ColorBulb {
     }
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
 
-
     // Brightness
     this.Brightness = Number(this.brightnessBLE);
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Brightness: ${this.Brightness}`);
@@ -260,8 +262,10 @@ export class ColorBulb {
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} blue: ${this.blue}`);
 
     const [hue, saturation] = rgb2hs(Number(this.red), Number(this.green), Number(this.blue));
-    this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName}`
-      + ` hs: ${JSON.stringify(rgb2hs(Number(this.red), Number(this.green), Number(this.blue)))}`);
+    this.debugLog(
+      `${this.device.deviceType}: ${this.accessory.displayName}` +
+        ` hs: ${JSON.stringify(rgb2hs(Number(this.red), Number(this.green), Number(this.blue)))}`,
+    );
 
     // Hue
     this.Hue = hue;
@@ -284,7 +288,7 @@ export class ColorBulb {
   async openAPIparseStatus() {
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} openAPIparseStatus`);
     switch (this.power) {
-      case 'on':
+      case "on":
         this.On = true;
         break;
       default:
@@ -299,14 +303,15 @@ export class ColorBulb {
     // Color, Hue & Brightness
     if (this.color) {
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} color: ${JSON.stringify(this.color)}`);
-      const [red, green, blue] = this.color!.split(':');
+      const [red, green, blue] = this.color!.split(":");
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} red: ${JSON.stringify(red)}`);
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} green: ${JSON.stringify(green)}`);
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} blue: ${JSON.stringify(blue)}`);
 
       const [hue, saturation] = rgb2hs(Number(red), Number(green), Number(blue));
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName}`
-        + ` hs: ${JSON.stringify(rgb2hs(Number(red), Number(green), Number(blue)))}`);
+      this.debugLog(
+        `${this.device.deviceType}: ${this.accessory.displayName}` + ` hs: ${JSON.stringify(rgb2hs(Number(red), Number(green), Number(blue)))}`,
+      );
 
       // Hue
       this.Hue = hue;
@@ -341,8 +346,10 @@ export class ColorBulb {
       await this.openAPIRefreshStatus();
     } else {
       await this.offlineOff();
-      this.debugWarnLog(`${this.device.deviceType}: ${this.accessory.displayName} Connection Type:`
-        + ` ${this.device.connectionType}, refreshStatus will not happen.`);
+      this.debugWarnLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} Connection Type:` +
+          ` ${this.device.connectionType}, refreshStatus will not happen.`,
+      );
     }
   }
 
@@ -352,7 +359,7 @@ export class ColorBulb {
     // Convert to BLE Address
     this.device.bleMac = this.device
       .deviceId!.match(/.{1,2}/g)!
-      .join(':')
+      .join(":")
       .toLowerCase();
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} BLE Address: ${this.device.bleMac}`);
     this.getCustomBLEAddress(switchbot);
@@ -360,15 +367,17 @@ export class ColorBulb {
     if (switchbot !== false) {
       switchbot
         .startScan({
-          model: 'u',
+          model: "u",
           id: this.device.bleMac,
         })
         .then(async () => {
           // Set an event hander
           switchbot.onadvertisement = async (ad: any) => {
             this.address = ad.address;
-            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Config BLE Address: ${this.device.bleMac},`
-              + ` BLE Address Found: ${this.address}`);
+            this.debugLog(
+              `${this.device.deviceType}: ${this.accessory.displayName} Config BLE Address: ${this.device.bleMac},` +
+                ` BLE Address Found: ${this.address}`,
+            );
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} serviceData: ${JSON.stringify(ad.serviceData)}`);
             this.serviceData = ad.serviceData;
             this.powerState = ad.serviceData.power;
@@ -408,8 +417,10 @@ export class ColorBulb {
         })
         .catch(async (e: any) => {
           this.apiError(e);
-          this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed BLERefreshStatus with ${this.device.connectionType}`
-            + ` Connection, Error Message: ${JSON.stringify(e.message)}`);
+          this.errorLog(
+            `${this.device.deviceType}: ${this.accessory.displayName} failed BLERefreshStatus with ${this.device.connectionType}` +
+              ` Connection, Error Message: ${JSON.stringify(e.message)}`,
+          );
           await this.BLERefreshConnection(switchbot);
         });
     } else {
@@ -436,8 +447,10 @@ export class ColorBulb {
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
       this.apiError(e);
-      this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed openAPIRefreshStatus with ${this.device.connectionType}`
-        + ` Connection, Error Message: ${JSON.stringify(e.message)}`);
+      this.errorLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} failed openAPIRefreshStatus with ${this.device.connectionType}` +
+          ` Connection, Error Message: ${JSON.stringify(e.message)}`,
+      );
     }
   }
 
@@ -455,14 +468,15 @@ export class ColorBulb {
   async pushChanges(): Promise<void> {
     if (!this.device.enableCloudService && this.OpenAPI) {
       this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} pushChanges enableCloudService: ${this.device.enableCloudService}`);
-    } else/* if (this.BLE) {
+    } /* if (this.BLE) {
       await this.BLEpushChanges();
-    } else*/if (this.OpenAPI && this.platform.config.credentials?.token) {
+    } else*/ else if (this.OpenAPI && this.platform.config.credentials?.token) {
       await this.openAPIpushChanges();
     } else {
       await this.offlineOff();
-      this.debugWarnLog(`${this.device.deviceType}: ${this.accessory.displayName} Connection Type:`
-          + ` ${this.device.connectionType}, pushChanges will not happen.`);
+      this.debugWarnLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} Connection Type:` + ` ${this.device.connectionType}, pushChanges will not happen.`,
+      );
     }
     // Refresh the status from the API
     interval(15000)
@@ -481,12 +495,12 @@ export class ColorBulb {
       // Convert to BLE Address
       this.device.bleMac = this.device
         .deviceId!.match(/.{1,2}/g)!
-        .join(':')
+        .join(":")
         .toLowerCase();
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} BLE Address: ${this.device.bleMac}`);
       switchbot
         .discover({
-          model: 'u',
+          model: "u",
           id: this.device.bleMac,
         })
         .then(async (device_list: any) => {
@@ -508,8 +522,10 @@ export class ColorBulb {
         })
         .catch(async (e: any) => {
           this.apiError(e);
-          this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed BLEpushChanges with ${this.device.connectionType}`
-            + ` Connection, Error Message: ${JSON.stringify(e.message)}`);
+          this.errorLog(
+            `${this.device.deviceType}: ${this.accessory.displayName} failed BLEpushChanges with ${this.device.connectionType}` +
+              ` Connection, Error Message: ${JSON.stringify(e.message)}`,
+          );
           await this.BLEPushConnection();
         });
       // Push Brightness Update
@@ -525,8 +541,9 @@ export class ColorBulb {
         await this.BLEpushRGBChanges();
       }
     } else {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No BLEpushChanges.` + `On: ${this.On}, `
-        + `OnCached: ${this.accessory.context.On}`);
+      this.debugLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} No BLEpushChanges.` + `On: ${this.On}, ` + `OnCached: ${this.accessory.context.On}`,
+      );
     }
   }
 
@@ -537,12 +554,12 @@ export class ColorBulb {
       // Convert to BLE Address
       this.device.bleMac = this.device
         .deviceId!.match(/.{1,2}/g)!
-        .join(':')
+        .join(":")
         .toLowerCase();
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} BLE Address: ${this.device.bleMac}`);
       switchbot
         .discover({
-          model: 'u',
+          model: "u",
           id: this.device.bleMac,
         })
         .then(async (device_list: any) => {
@@ -555,13 +572,18 @@ export class ColorBulb {
         })
         .catch(async (e: any) => {
           this.apiError(e);
-          this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed BLEpushBrightnessChanges with ${this.device.connectionType}`
-            + ` Connection, Error Message: ${JSON.stringify(e.message)}`);
+          this.errorLog(
+            `${this.device.deviceType}: ${this.accessory.displayName} failed BLEpushBrightnessChanges with ${this.device.connectionType}` +
+              ` Connection, Error Message: ${JSON.stringify(e.message)}`,
+          );
           await this.BLEPushConnection();
         });
     } else {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No BLEpushBrightnessChanges.` + `Brightness: ${this.Brightness}, `
-        + `BrightnessCached: ${this.accessory.context.Brightness}`);
+      this.debugLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} No BLEpushBrightnessChanges.` +
+          `Brightness: ${this.Brightness}, ` +
+          `BrightnessCached: ${this.accessory.context.Brightness}`,
+      );
     }
   }
 
@@ -572,12 +594,12 @@ export class ColorBulb {
       // Convert to BLE Address
       this.device.bleMac = this.device
         .deviceId!.match(/.{1,2}/g)!
-        .join(':')
+        .join(":")
         .toLowerCase();
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} BLE Address: ${this.device.bleMac}`);
       switchbot
         .discover({
-          model: 'u',
+          model: "u",
           id: this.device.bleMac,
         })
         .then(async (device_list: any) => {
@@ -590,14 +612,17 @@ export class ColorBulb {
         })
         .catch(async (e: any) => {
           this.apiError(e);
-          this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed BLEpushColorTemperatureChanges with `
-            + `${this.device.connectionType} Connection, Error Message: ${JSON.stringify(e.message)}`);
+          this.errorLog(
+            `${this.device.deviceType}: ${this.accessory.displayName} failed BLEpushColorTemperatureChanges with ` +
+              `${this.device.connectionType} Connection, Error Message: ${JSON.stringify(e.message)}`,
+          );
           await this.BLEPushConnection();
         });
     } else {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No BLEpushColorTemperatureChanges.` +
-        `ColorTemperature: ${this.ColorTemperature}, ColorTemperatureCached: ${this.accessory.context.ColorTemperature}`);
-
+      this.debugLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} No BLEpushColorTemperatureChanges.` +
+          `ColorTemperature: ${this.ColorTemperature}, ColorTemperatureCached: ${this.accessory.context.ColorTemperature}`,
+      );
     }
   }
 
@@ -614,16 +639,16 @@ export class ColorBulb {
       // Convert to BLE Address
       this.device.bleMac = this.device
         .deviceId!.match(/.{1,2}/g)!
-        .join(':')
+        .join(":")
         .toLowerCase();
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} BLE Address: ${this.device.bleMac}`);
       switchbot
         .discover({
-          model: 'u',
+          model: "u",
           id: this.device.bleMac,
         })
         .then(async (device_list: any) => {
-          this.infoLog(`${this.accessory.displayName} Target RGB: ${this.Brightness, red, green, blue}`);
+          this.infoLog(`${this.accessory.displayName} Target RGB: ${(this.Brightness, red, green, blue)}`);
           return await device_list[0].setRGB(this.Brightness, red, green, blue);
         })
         .then(() => {
@@ -632,51 +657,56 @@ export class ColorBulb {
         })
         .catch(async (e: any) => {
           this.apiError(e);
-          this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed BLEpushRGBChanges with ${this.device.connectionType}`
-            + ` Connection, Error Message: ${JSON.stringify(e.message)}`);
+          this.errorLog(
+            `${this.device.deviceType}: ${this.accessory.displayName} failed BLEpushRGBChanges with ${this.device.connectionType}` +
+              ` Connection, Error Message: ${JSON.stringify(e.message)}`,
+          );
           await this.BLEPushConnection();
         });
     } else {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No BLEpushRGBChanges. Hue: ${this.Hue}, `
-        + `HueCached: ${this.accessory.context.Hue}, Saturation: ${this.Saturation}, SaturationCached: ${this.accessory.context.Saturation}`);
+      this.debugLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} No BLEpushRGBChanges. Hue: ${this.Hue}, ` +
+          `HueCached: ${this.accessory.context.Hue}, Saturation: ${this.Saturation}, SaturationCached: ${this.accessory.context.Saturation}`,
+      );
     }
   }
 
   async openAPIpushChanges(): Promise<void> {
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} openAPIpushChanges`);
-    if (this.On !== this.accessory.context.On) {
-      let command = '';
-      if (this.On) {
-        command = 'turnOn';
-      } else {
-        command = 'turnOff';
-      }
-      const bodyChange = JSON.stringify({
-        'command': `${command}`,
-        'parameter': 'default',
-        'commandType': 'command',
-      });
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
-      try {
-        const { body, statusCode, headers } = await request(`${Devices}/${this.device.deviceId}/commands`, {
-          body: bodyChange,
-          method: 'POST',
-          headers: this.platform.generateHeaders(),
-        });
-        const deviceStatus = await body.json();
-        this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
-        this.statusCode(statusCode);
-        this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
-      } catch (e: any) {
-        this.apiError(e);
-        this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed openAPIpushChanges with ${this.device.connectionType}`
-          + ` Connection, Error Message: ${JSON.stringify(e.message)}`,
-        );
-      }
+    // if (this.On !== this.accessory.context.On) {
+    let command = "";
+    if (this.On) {
+      command = "turnOn";
     } else {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No openAPIpushChanges.` + `On: ${this.On}, `
-        + `OnCached: ${this.accessory.context.On}`);
+      command = "turnOff";
     }
+    const bodyChange = JSON.stringify({
+      command: `${command}`,
+      parameter: "default",
+      commandType: "command",
+    });
+    this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
+    try {
+      const { body, statusCode, headers } = await request(`${Devices}/${this.device.deviceId}/commands`, {
+        body: bodyChange,
+        method: "POST",
+        headers: this.platform.generateHeaders(),
+      });
+      const deviceStatus = await body.json();
+      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
+      this.statusCode(statusCode);
+      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
+    } catch (e: any) {
+      this.apiError(e);
+      this.errorLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} failed openAPIpushChanges with ${this.device.connectionType}` +
+          ` Connection, Error Message: ${JSON.stringify(e.message)}`,
+      );
+    }
+    // } else {
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No openAPIpushChanges.` + `On: ${this.On}, `
+    //     + `OnCached: ${this.accessory.context.On}`);
+    // }
     // Push Hue & Saturation Update
     if (this.On) {
       await this.pushHueSaturationChanges();
@@ -699,15 +729,15 @@ export class ColorBulb {
       const [red, green, blue] = hs2rgb(Number(this.Hue), Number(this.Saturation));
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} rgb: ${JSON.stringify([red, green, blue])}`);
       const bodyChange = JSON.stringify({
-        'command': 'setColor',
-        'parameter': `${red}:${green}:${blue}`,
-        'commandType': 'command',
+        command: "setColor",
+        parameter: `${red}:${green}:${blue}`,
+        commandType: "command",
       });
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
       try {
         const { body, statusCode, headers } = await request(`${Devices}/${this.device.deviceId}/commands`, {
           body: bodyChange,
-          method: 'POST',
+          method: "POST",
           headers: this.platform.generateHeaders(),
         });
         const deviceStatus = await body.json();
@@ -716,13 +746,16 @@ export class ColorBulb {
         this.debugLog(`Headers: ${JSON.stringify(headers)}`);
       } catch (e: any) {
         this.apiError(e);
-        this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed pushHueSaturationChanges with ${this.device.connectionType}`
-          + ` Connection, Error Message: ${JSON.stringify(e.message)}`,
+        this.errorLog(
+          `${this.device.deviceType}: ${this.accessory.displayName} failed pushHueSaturationChanges with ${this.device.connectionType}` +
+            ` Connection, Error Message: ${JSON.stringify(e.message)}`,
         );
       }
     } else {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No pushHueSaturationChanges. Hue: ${this.Hue}, `
-        + `HueCached: ${this.accessory.context.Hue}, Saturation: ${this.Saturation}, SaturationCached: ${this.accessory.context.Saturation}`);
+      this.debugLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} No pushHueSaturationChanges. Hue: ${this.Hue}, ` +
+          `HueCached: ${this.accessory.context.Hue}, Saturation: ${this.Saturation}, SaturationCached: ${this.accessory.context.Saturation}`,
+      );
     }
   }
 
@@ -732,15 +765,15 @@ export class ColorBulb {
       const kelvin = Math.round(1000000 / Number(this.ColorTemperature));
       this.cacheKelvin = kelvin;
       const bodyChange = JSON.stringify({
-        'command': 'setColorTemperature',
-        'parameter': `${kelvin}`,
-        'commandType': 'command',
+        command: "setColorTemperature",
+        parameter: `${kelvin}`,
+        commandType: "command",
       });
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
       try {
         const { body, statusCode, headers } = await request(`${Devices}/${this.device.deviceId}/commands`, {
           body: bodyChange,
-          method: 'POST',
+          method: "POST",
           headers: this.platform.generateHeaders(),
         });
         const deviceStatus = await body.json();
@@ -749,13 +782,16 @@ export class ColorBulb {
         this.debugLog(`Headers: ${JSON.stringify(headers)}`);
       } catch (e: any) {
         this.apiError(e);
-        this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed pushColorTemperatureChanges with ${this.device.connectionType}`
-          + ` Connection, Error Message: ${JSON.stringify(e.message)}`,
+        this.errorLog(
+          `${this.device.deviceType}: ${this.accessory.displayName} failed pushColorTemperatureChanges with ${this.device.connectionType}` +
+            ` Connection, Error Message: ${JSON.stringify(e.message)}`,
         );
       }
     } else {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No pushColorTemperatureChanges.` +
-        `ColorTemperature: ${this.ColorTemperature}, ColorTemperatureCached: ${this.accessory.context.ColorTemperature}`);
+      this.debugLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} No pushColorTemperatureChanges.` +
+          `ColorTemperature: ${this.ColorTemperature}, ColorTemperatureCached: ${this.accessory.context.ColorTemperature}`,
+      );
     }
   }
 
@@ -763,15 +799,15 @@ export class ColorBulb {
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} pushBrightnessChanges`);
     if (this.Brightness !== this.accessory.context.Brightness) {
       const bodyChange = JSON.stringify({
-        'command': 'setBrightness',
-        'parameter': `${this.Brightness}`,
-        'commandType': 'command',
+        command: "setBrightness",
+        parameter: `${this.Brightness}`,
+        commandType: "command",
       });
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
       try {
         const { body, statusCode, headers } = await request(`${Devices}/${this.device.deviceId}/commands`, {
           body: bodyChange,
-          method: 'POST',
+          method: "POST",
           headers: this.platform.generateHeaders(),
         });
         const deviceStatus = await body.json();
@@ -780,13 +816,17 @@ export class ColorBulb {
         this.debugLog(`Headers: ${JSON.stringify(headers)}`);
       } catch (e: any) {
         this.apiError(e);
-        this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed pushBrightnessChanges with ${this.device.connectionType}`
-          + ` Connection, Error Message: ${JSON.stringify(e.message)}`,
+        this.errorLog(
+          `${this.device.deviceType}: ${this.accessory.displayName} failed pushBrightnessChanges with ${this.device.connectionType}` +
+            ` Connection, Error Message: ${JSON.stringify(e.message)}`,
         );
       }
     } else {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No pushBrightnessChanges.` + `Brightness: ${this.Brightness}, `
-        + `BrightnessCached: ${this.accessory.context.Brightness}`);
+      this.debugLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} No pushBrightnessChanges.` +
+          `Brightness: ${this.Brightness}, ` +
+          `BrightnessCached: ${this.accessory.context.Brightness}`,
+      );
     }
   }
 
@@ -946,16 +986,16 @@ export class ColorBulb {
   }
 
   async getCustomBLEAddress(switchbot: any) {
-    if (this.device.customBLEaddress && this.deviceLogging.includes('debug')) {
+    if (this.device.customBLEaddress && this.deviceLogging.includes("debug")) {
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} customBLEaddress: ${this.device.customBLEaddress}`);
       (async () => {
         // Start to monitor advertisement packets
         await switchbot.startScan({
-          model: 'u',
+          model: "u",
         });
         // Set an event handler
         switchbot.onadvertisement = (ad: any) => {
-          this.warnLog(`${this.device.deviceType}: ${this.accessory.displayName} ad: ${JSON.stringify(ad, null, '  ')}`);
+          this.warnLog(`${this.device.deviceType}: ${this.accessory.displayName} ad: ${JSON.stringify(ad, null, "  ")}`);
         };
         await sleep(10000);
         // Stop to monitor
@@ -965,7 +1005,7 @@ export class ColorBulb {
   }
 
   async BLEPushConnection() {
-    if (this.platform.config.credentials?.token && this.device.connectionType === 'BLE/OpenAPI') {
+    if (this.platform.config.credentials?.token && this.device.connectionType === "BLE/OpenAPI") {
       this.warnLog(`${this.device.deviceType}: ${this.accessory.displayName} Using OpenAPI Connection to Push Changes`);
       await this.openAPIpushChanges();
     }
@@ -973,7 +1013,7 @@ export class ColorBulb {
 
   async BLERefreshConnection(switchbot: any): Promise<void> {
     this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} wasn't able to establish BLE Connection, node-switchbot: ${switchbot}`);
-    if (this.platform.config.credentials?.token && this.device.connectionType === 'BLE/OpenAPI') {
+    if (this.platform.config.credentials?.token && this.device.connectionType === "BLE/OpenAPI") {
       this.warnLog(`${this.device.deviceType}: ${this.accessory.displayName} Using OpenAPI Connection to Refresh Status`);
       await this.openAPIRefreshStatus();
     }
@@ -1038,8 +1078,10 @@ export class ColorBulb {
         this.offlineOff();
         break;
       case 171:
-        this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} Hub Device is offline, statusCode: ${statusCode}. `
-        + `Hub: ${this.device.hubDeviceId}`);
+        this.errorLog(
+          `${this.device.deviceType}: ${this.accessory.displayName} Hub Device is offline, statusCode: ${statusCode}. ` +
+            `Hub: ${this.device.hubDeviceId}`,
+        );
         this.offlineOff();
         break;
       case 190:
@@ -1055,8 +1097,10 @@ export class ColorBulb {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Request successful, statusCode: ${statusCode}`);
         break;
       default:
-        this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Unknown statusCode: `
-        + `${statusCode}, Submit Bugs Here: ' + 'https://tinyurl.com/SwitchBotBug`);
+        this.infoLog(
+          `${this.device.deviceType}: ${this.accessory.displayName} Unknown statusCode: ` +
+            `${statusCode}, Submit Bugs Here: ' + 'https://tinyurl.com/SwitchBotBug`,
+        );
     }
   }
 
@@ -1077,8 +1121,9 @@ export class ColorBulb {
 
   FirmwareRevision(accessory: PlatformAccessory<Context>, device: device & devicesConfig): CharacteristicValue {
     let FirmwareRevision: string;
-    this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName}`
-      + ` accessory.context.FirmwareRevision: ${accessory.context.FirmwareRevision}`);
+    this.debugLog(
+      `${this.device.deviceType}: ${this.accessory.displayName}` + ` accessory.context.FirmwareRevision: ${accessory.context.FirmwareRevision}`,
+    );
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} device.firmware: ${device.firmware}`);
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} this.platform.version: ${this.platform.version}`);
     if (accessory.context.FirmwareRevision) {
@@ -1137,25 +1182,25 @@ export class ColorBulb {
       config = device.colorbulb;
     }
     if (device.connectionType !== undefined) {
-      config['connectionType'] = device.connectionType;
+      config["connectionType"] = device.connectionType;
     }
     if (device.external !== undefined) {
-      config['external'] = device.external;
+      config["external"] = device.external;
     }
     if (device.logging !== undefined) {
-      config['logging'] = device.logging;
+      config["logging"] = device.logging;
     }
     if (device.refreshRate !== undefined) {
-      config['refreshRate'] = device.refreshRate;
+      config["refreshRate"] = device.refreshRate;
     }
     if (device.scanDuration !== undefined) {
-      config['scanDuration'] = device.scanDuration;
+      config["scanDuration"] = device.scanDuration;
     }
     if (device.offline !== undefined) {
-      config['offline'] = device.offline;
+      config["offline"] = device.offline;
     }
     if (device.maxRetry !== undefined) {
-      config['maxRetry'] = device.maxRetry;
+      config["maxRetry"] = device.maxRetry;
     }
     if (Object.entries(config).length !== 0) {
       this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Config: ${JSON.stringify(config)}`);
@@ -1164,7 +1209,7 @@ export class ColorBulb {
 
   async logs(device: device & devicesConfig): Promise<void> {
     if (this.platform.debugMode) {
-      this.deviceLogging = this.accessory.context.logging = 'debugMode';
+      this.deviceLogging = this.accessory.context.logging = "debugMode";
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
     } else if (device.logging) {
       this.deviceLogging = this.accessory.context.logging = device.logging;
@@ -1173,7 +1218,7 @@ export class ColorBulb {
       this.deviceLogging = this.accessory.context.logging = this.platform.config.options?.logging;
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Using Platform Config Logging: ${this.deviceLogging}`);
     } else {
-      this.deviceLogging = this.accessory.context.logging = 'standard';
+      this.deviceLogging = this.accessory.context.logging = "standard";
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Logging Not Set, Using: ${this.deviceLogging}`);
     }
   }
@@ -1195,8 +1240,8 @@ export class ColorBulb {
 
   debugWarnLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
-      if (this.deviceLogging?.includes('debug')) {
-        this.platform.log.warn('[DEBUG]', String(...log));
+      if (this.deviceLogging?.includes("debug")) {
+        this.platform.log.warn("[DEBUG]", String(...log));
       }
     }
   }
@@ -1209,16 +1254,16 @@ export class ColorBulb {
 
   debugErrorLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
-      if (this.deviceLogging?.includes('debug')) {
-        this.platform.log.error('[DEBUG]', String(...log));
+      if (this.deviceLogging?.includes("debug")) {
+        this.platform.log.error("[DEBUG]", String(...log));
       }
     }
   }
 
   debugLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
-      if (this.deviceLogging === 'debug') {
-        this.platform.log.info('[DEBUG]', String(...log));
+      if (this.deviceLogging === "debug") {
+        this.platform.log.info("[DEBUG]", String(...log));
       } else {
         this.platform.log.debug(String(...log));
       }
@@ -1226,6 +1271,6 @@ export class ColorBulb {
   }
 
   enablingDeviceLogging(): boolean {
-    return this.deviceLogging.includes('debug') || this.deviceLogging === 'standard';
+    return this.deviceLogging.includes("debug") || this.deviceLogging === "standard";
   }
 }
