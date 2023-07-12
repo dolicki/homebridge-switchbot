@@ -487,6 +487,7 @@ export class ColorBulb {
       this.debugLog(`Devices: ${JSON.stringify(deviceStatus.body)}`);
       this.statusCode(statusCode);
       this.debugLog(`Headers: ${JSON.stringify(headers)}`);
+      this.Brightness = value;
     } catch (e: any) {
       this.apiError(e);
       this.errorLog(
@@ -523,16 +524,13 @@ export class ColorBulb {
 
     this.infoLog(`BrightnessSet - value: ${value}`);
     this.brightnessDebounce = value;
-    await this.updateHomeKitCharacteristics();
     await this.brightnessDebounceHandler(this);
   }
 
   async brightnessSetDebounceWrapper(object: this) {
     await object.updateHomeKitCharacteristics();
-    //this.debugLog(`BULB API CALL: ${this.brightnessDebounce}`);
     console.log(`BULB API CALL: ${object.brightnessDebounce}`);
     await object.pushBrightnessChanges(object.brightnessDebounce);
-    object.Brightness = object.brightnessDebounce;
   }
 
   /**

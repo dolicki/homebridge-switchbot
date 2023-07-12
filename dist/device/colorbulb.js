@@ -392,6 +392,7 @@ class ColorBulb {
             this.debugLog(`Devices: ${JSON.stringify(deviceStatus.body)}`);
             this.statusCode(statusCode);
             this.debugLog(`Headers: ${JSON.stringify(headers)}`);
+            this.Brightness = value;
         }
         catch (e) {
             this.apiError(e);
@@ -418,15 +419,12 @@ class ColorBulb {
         // }
         this.infoLog(`BrightnessSet - value: ${value}`);
         this.brightnessDebounce = value;
-        await this.updateHomeKitCharacteristics();
         await this.brightnessDebounceHandler(this);
     }
     async brightnessSetDebounceWrapper(object) {
         await object.updateHomeKitCharacteristics();
-        //this.debugLog(`BULB API CALL: ${this.brightnessDebounce}`);
         console.log(`BULB API CALL: ${object.brightnessDebounce}`);
         await object.pushBrightnessChanges(object.brightnessDebounce);
-        object.Brightness = object.brightnessDebounce;
     }
     /**
      * Handle requests to set the value of the "ColorTemperature" characteristic
