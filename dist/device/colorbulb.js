@@ -500,10 +500,9 @@ class ColorBulb {
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Brightness: ${this.Brightness}`);
         }
         else {
-            this.Brightness = this.brightnessDebounce;
             this.accessory.context.Brightness = this.Brightness;
-            this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Brightness, this.Brightness);
-            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Brightness: ${this.Brightness}`);
+            this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Brightness, this.brightnessDebounce);
+            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Brightness: ${this.brightnessDebounce}`);
         }
         // if (this.ColorTemperature === undefined) {
         //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} ColorTemperature: ${this.ColorTemperature}`);
