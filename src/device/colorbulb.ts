@@ -674,6 +674,26 @@ export class ColorBulb {
   async openAPIpushChanges(): Promise<void> {
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} openAPIpushChanges`);
     // if (this.On !== this.accessory.context.On) {
+    //await this.pushOnOffCommand();
+    // } else {
+    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No openAPIpushChanges.` + `On: ${this.On}, `
+    //     + `OnCached: ${this.accessory.context.On}`);
+    // }
+    // Push Hue & Saturation Update
+    if (this.On) {
+      // await this.pushHueSaturationChanges();
+    }
+    // Push ColorTemperature Update
+    if (this.On) {
+      // await this.pushColorTemperatureChanges();
+    }
+    // Push Brightness Update
+    if (this.On) {
+      //await this.pushBrightnessChanges();
+    }
+  }
+
+  private async pushOnOffCommand() {
     let command = "";
     if (this.On) {
       command = "turnOn";
@@ -703,22 +723,6 @@ export class ColorBulb {
         `${this.device.deviceType}: ${this.accessory.displayName} failed openAPIpushChanges with ${this.device.connectionType}` +
           ` Connection, Error Message: ${JSON.stringify(e.message)}`,
       );
-    }
-    // } else {
-    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No openAPIpushChanges.` + `On: ${this.On}, `
-    //     + `OnCached: ${this.accessory.context.On}`);
-    // }
-    // Push Hue & Saturation Update
-    if (this.On) {
-      // await this.pushHueSaturationChanges();
-    }
-    // Push ColorTemperature Update
-    if (this.On) {
-      // await this.pushColorTemperatureChanges();
-    }
-    // Push Brightness Update
-    if (this.On) {
-      await this.pushBrightnessChanges();
     }
   }
 
@@ -842,7 +846,8 @@ export class ColorBulb {
     }
 
     this.On = value;
-    this.doColorBulbUpdate.next();
+    await this.pushOnOffCommand();
+    //this.doColorBulbUpdate.next();
   }
 
   /**

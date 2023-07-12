@@ -84,6 +84,7 @@ export declare class ColorBulb {
     BLEpushColorTemperatureChanges(): Promise<void>;
     BLEpushRGBChanges(): Promise<void>;
     openAPIpushChanges(): Promise<void>;
+    private pushOnOffCommand;
     pushHueSaturationChanges(): Promise<void>;
     pushColorTemperatureChanges(): Promise<void>;
     pushBrightnessChanges(): Promise<void>;

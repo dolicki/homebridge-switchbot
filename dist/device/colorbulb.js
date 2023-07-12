@@ -553,6 +553,25 @@ class ColorBulb {
     async openAPIpushChanges() {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} openAPIpushChanges`);
         // if (this.On !== this.accessory.context.On) {
+        //await this.pushOnOffCommand();
+        // } else {
+        //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No openAPIpushChanges.` + `On: ${this.On}, `
+        //     + `OnCached: ${this.accessory.context.On}`);
+        // }
+        // Push Hue & Saturation Update
+        if (this.On) {
+            // await this.pushHueSaturationChanges();
+        }
+        // Push ColorTemperature Update
+        if (this.On) {
+            // await this.pushColorTemperatureChanges();
+        }
+        // Push Brightness Update
+        if (this.On) {
+            //await this.pushBrightnessChanges();
+        }
+    }
+    async pushOnOffCommand() {
         let command = "";
         if (this.On) {
             command = "turnOn";
@@ -582,22 +601,6 @@ class ColorBulb {
             this.apiError(e);
             this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed openAPIpushChanges with ${this.device.connectionType}` +
                 ` Connection, Error Message: ${JSON.stringify(e.message)}`);
-        }
-        // } else {
-        //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No openAPIpushChanges.` + `On: ${this.On}, `
-        //     + `OnCached: ${this.accessory.context.On}`);
-        // }
-        // Push Hue & Saturation Update
-        if (this.On) {
-            // await this.pushHueSaturationChanges();
-        }
-        // Push ColorTemperature Update
-        if (this.On) {
-            // await this.pushColorTemperatureChanges();
-        }
-        // Push Brightness Update
-        if (this.On) {
-            await this.pushBrightnessChanges();
         }
     }
     async pushHueSaturationChanges() {
@@ -713,7 +716,8 @@ class ColorBulb {
             this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set On: ${value}`);
         }
         this.On = value;
-        this.doColorBulbUpdate.next();
+        await this.pushOnOffCommand();
+        //this.doColorBulbUpdate.next();
     }
     /**
      * Handle requests to set the value of the "Brightness" characteristic
