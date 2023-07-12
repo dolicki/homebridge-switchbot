@@ -33,7 +33,7 @@ class ColorBulb {
          * Handle requests to set the value of the "Brightness" characteristic
          */
         this.brightnessDebounce = 0;
-        this.brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper, 850);
+        this.brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper, 350);
         // default placeholders
         this.init(device, accessory, platform);
     }

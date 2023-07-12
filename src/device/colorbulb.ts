@@ -511,7 +511,7 @@ export class ColorBulb {
    * Handle requests to set the value of the "Brightness" characteristic
    */
   brightnessDebounce: CharacteristicValue = 0;
-  brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper, 850);
+  brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper, 350);
 
   async BrightnessSet(value: CharacteristicValue): Promise<void> {
     // if (this.Brightness === this.accessory.context.Brightness) {
