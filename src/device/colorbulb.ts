@@ -527,12 +527,12 @@ export class ColorBulb {
     await this.brightnessDebounceHandler(this);
   }
 
-  async brightnessSetDebounceWrapper(this: this) {
-    await this.updateHomeKitCharacteristics();
+  async brightnessSetDebounceWrapper(object: this) {
+    await object.updateHomeKitCharacteristics();
     //this.debugLog(`BULB API CALL: ${this.brightnessDebounce}`);
-    console.log(`BULB API CALL: ${this.brightnessDebounce}`);
-    await this.pushBrightnessChanges(this.brightnessDebounce);
-    this.Brightness = this.brightnessDebounce;
+    console.log(`BULB API CALL: ${object.brightnessDebounce}`);
+    await object.pushBrightnessChanges(object.brightnessDebounce);
+    object.Brightness = object.brightnessDebounce;
   }
 
   /**

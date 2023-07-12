@@ -421,12 +421,12 @@ class ColorBulb {
         await this.updateHomeKitCharacteristics();
         await this.brightnessDebounceHandler(this);
     }
-    async brightnessSetDebounceWrapper() {
-        await this.updateHomeKitCharacteristics();
+    async brightnessSetDebounceWrapper(object) {
+        await object.updateHomeKitCharacteristics();
         //this.debugLog(`BULB API CALL: ${this.brightnessDebounce}`);
-        console.log(`BULB API CALL: ${this.brightnessDebounce}`);
-        await this.pushBrightnessChanges(this.brightnessDebounce);
-        this.Brightness = this.brightnessDebounce;
+        console.log(`BULB API CALL: ${object.brightnessDebounce}`);
+        await object.pushBrightnessChanges(object.brightnessDebounce);
+        object.Brightness = object.brightnessDebounce;
     }
     /**
      * Handle requests to set the value of the "ColorTemperature" characteristic
