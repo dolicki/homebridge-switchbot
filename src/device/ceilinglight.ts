@@ -552,111 +552,111 @@ export class CeilingLight {
 
   async pushHueSaturationChanges(): Promise<void> {
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} pushHueSaturationChanges`);
-    if (this.Hue !== this.accessory.context.Hue || this.Saturation !== this.accessory.context.Saturation) {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${JSON.stringify(this.Hue)}`);
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation: ${JSON.stringify(this.Saturation)}`);
-      const [red, green, blue] = hs2rgb(Number(this.Hue), Number(this.Saturation));
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} rgb: ${JSON.stringify([red, green, blue])}`);
-      const bodyChange = JSON.stringify({
-        command: "setColor",
-        parameter: `${red}:${green}:${blue}`,
-        commandType: "command",
+    // if (this.Hue !== this.accessory.context.Hue || this.Saturation !== this.accessory.context.Saturation) {
+    this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${JSON.stringify(this.Hue)}`);
+    this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation: ${JSON.stringify(this.Saturation)}`);
+    const [red, green, blue] = hs2rgb(Number(this.Hue), Number(this.Saturation));
+    this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} rgb: ${JSON.stringify([red, green, blue])}`);
+    const bodyChange = JSON.stringify({
+      command: "setColor",
+      parameter: `${red}:${green}:${blue}`,
+      commandType: "command",
+    });
+    this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
+    try {
+      const { body, statusCode, headers } = await request(`${Devices}/${this.device.deviceId}/commands`, {
+        body: bodyChange,
+        method: "POST",
+        headers: this.platform.generateHeaders(),
       });
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
-      try {
-        const { body, statusCode, headers } = await request(`${Devices}/${this.device.deviceId}/commands`, {
-          body: bodyChange,
-          method: "POST",
-          headers: this.platform.generateHeaders(),
-        });
-        const deviceStatus = await body.json();
-        this.debugLog(`Devices: ${JSON.stringify(deviceStatus.body)}`);
-        this.statusCode(statusCode);
-        this.debugLog(`Headers: ${JSON.stringify(headers)}`);
-      } catch (e: any) {
-        this.apiError(e);
-        this.errorLog(
-          `${this.device.deviceType}: ${this.accessory.displayName} failed pushHueSaturationChanges with ${this.device.connectionType}` +
-            ` Connection, Error Message: ${JSON.stringify(e.message)}`,
-        );
-      }
-    } else {
-      this.debugLog(
-        `${this.device.deviceType}: ${this.accessory.displayName} No pushHueSaturationChanges. Hue: ${this.Hue}, ` +
-          `HueCached: ${this.accessory.context.Hue}, Saturation: ${this.Saturation}, SaturationCached: ${this.accessory.context.Saturation}`,
+      const deviceStatus = await body.json();
+      this.debugLog(`Devices: ${JSON.stringify(deviceStatus.body)}`);
+      this.statusCode(statusCode);
+      this.debugLog(`Headers: ${JSON.stringify(headers)}`);
+    } catch (e: any) {
+      this.apiError(e);
+      this.errorLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} failed pushHueSaturationChanges with ${this.device.connectionType}` +
+          ` Connection, Error Message: ${JSON.stringify(e.message)}`,
       );
     }
+    // } else {
+    //   this.debugLog(
+    //     `${this.device.deviceType}: ${this.accessory.displayName} No pushHueSaturationChanges. Hue: ${this.Hue}, ` +
+    //       `HueCached: ${this.accessory.context.Hue}, Saturation: ${this.Saturation}, SaturationCached: ${this.accessory.context.Saturation}`,
+    //   );
+    // }
   }
 
   async pushColorTemperatureChanges(): Promise<void> {
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} pushColorTemperatureChanges`);
-    if (this.ColorTemperature !== this.accessory.context.ColorTemperature) {
-      const kelvin = Math.round(1000000 / Number(this.ColorTemperature));
-      this.cacheKelvin = kelvin;
-      const bodyChange = JSON.stringify({
-        command: "setColorTemperature",
-        parameter: `${kelvin}`,
-        commandType: "command",
+    // if (this.ColorTemperature !== this.accessory.context.ColorTemperature) {
+    const kelvin = Math.round(1000000 / Number(this.ColorTemperature));
+    this.cacheKelvin = kelvin;
+    const bodyChange = JSON.stringify({
+      command: "setColorTemperature",
+      parameter: `${kelvin}`,
+      commandType: "command",
+    });
+    this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
+    try {
+      const { body, statusCode, headers } = await request(`${Devices}/${this.device.deviceId}/commands`, {
+        body: bodyChange,
+        method: "POST",
+        headers: this.platform.generateHeaders(),
       });
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
-      try {
-        const { body, statusCode, headers } = await request(`${Devices}/${this.device.deviceId}/commands`, {
-          body: bodyChange,
-          method: "POST",
-          headers: this.platform.generateHeaders(),
-        });
-        const deviceStatus = await body.json();
-        this.debugLog(`Devices: ${JSON.stringify(deviceStatus.body)}`);
-        this.statusCode(statusCode);
-        this.debugLog(`Headers: ${JSON.stringify(headers)}`);
-      } catch (e: any) {
-        this.apiError(e);
-        this.errorLog(
-          `${this.device.deviceType}: ${this.accessory.displayName} failed pushColorTemperatureChanges with ${this.device.connectionType}` +
-            ` Connection, Error Message: ${JSON.stringify(e.message)}`,
-        );
-      }
-    } else {
-      this.debugLog(
-        `${this.device.deviceType}: ${this.accessory.displayName} No pushColorTemperatureChanges.` +
-          `ColorTemperature: ${this.ColorTemperature}, ColorTemperatureCached: ${this.accessory.context.ColorTemperature}`,
+      const deviceStatus = await body.json();
+      this.debugLog(`Devices: ${JSON.stringify(deviceStatus.body)}`);
+      this.statusCode(statusCode);
+      this.debugLog(`Headers: ${JSON.stringify(headers)}`);
+    } catch (e: any) {
+      this.apiError(e);
+      this.errorLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} failed pushColorTemperatureChanges with ${this.device.connectionType}` +
+          ` Connection, Error Message: ${JSON.stringify(e.message)}`,
       );
     }
+    // } else {
+    //   this.debugLog(
+    //     `${this.device.deviceType}: ${this.accessory.displayName} No pushColorTemperatureChanges.` +
+    //       `ColorTemperature: ${this.ColorTemperature}, ColorTemperatureCached: ${this.accessory.context.ColorTemperature}`,
+    //   );
+    // }
   }
 
   async pushBrightnessChanges(): Promise<void> {
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} pushBrightnessChanges`);
-    if (this.Brightness !== this.accessory.context.Brightness) {
-      const bodyChange = JSON.stringify({
-        command: "setBrightness",
-        parameter: `${this.Brightness}`,
-        commandType: "command",
+    // if (this.Brightness !== this.accessory.context.Brightness) {
+    const bodyChange = JSON.stringify({
+      command: "setBrightness",
+      parameter: `${this.Brightness}`,
+      commandType: "command",
+    });
+    this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
+    try {
+      const { body, statusCode, headers } = await request(`${Devices}/${this.device.deviceId}/commands`, {
+        body: bodyChange,
+        method: "POST",
+        headers: this.platform.generateHeaders(),
       });
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
-      try {
-        const { body, statusCode, headers } = await request(`${Devices}/${this.device.deviceId}/commands`, {
-          body: bodyChange,
-          method: "POST",
-          headers: this.platform.generateHeaders(),
-        });
-        const deviceStatus = await body.json();
-        this.debugLog(`Devices: ${JSON.stringify(deviceStatus.body)}`);
-        this.statusCode(statusCode);
-        this.debugLog(`Headers: ${JSON.stringify(headers)}`);
-      } catch (e: any) {
-        this.apiError(e);
-        this.errorLog(
-          `${this.device.deviceType}: ${this.accessory.displayName} failed pushBrightnessChanges with ${this.device.connectionType}` +
-            ` Connection, Error Message: ${JSON.stringify(e.message)}`,
-        );
-      }
-    } else {
-      this.debugLog(
-        `${this.device.deviceType}: ${this.accessory.displayName} No pushBrightnessChanges.` +
-          `Brightness: ${this.Brightness}, ` +
-          `BrightnessCached: ${this.accessory.context.Brightness}`,
+      const deviceStatus = await body.json();
+      this.debugLog(`Devices: ${JSON.stringify(deviceStatus.body)}`);
+      this.statusCode(statusCode);
+      this.debugLog(`Headers: ${JSON.stringify(headers)}`);
+    } catch (e: any) {
+      this.apiError(e);
+      this.errorLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} failed pushBrightnessChanges with ${this.device.connectionType}` +
+          ` Connection, Error Message: ${JSON.stringify(e.message)}`,
       );
     }
+    // } else {
+    //   this.debugLog(
+    //     `${this.device.deviceType}: ${this.accessory.displayName} No pushBrightnessChanges.` +
+    //       `Brightness: ${this.Brightness}, ` +
+    //       `BrightnessCached: ${this.accessory.context.Brightness}`,
+    //   );
+    // }
   }
 
   /**
