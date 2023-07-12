@@ -521,7 +521,8 @@ export class ColorBulb {
     this.infoLog(`BrightnessSet - value: ${value}`);
     this.brightnessDebounce = value;
 
-    debounce(this.brightnessSetDebounceWrapper, 5000);
+    const debouncedEventListener = debounce(await this.brightnessSetDebounceWrapper, 5000);
+    debouncedEventListener();
   }
 
   async brightnessSetDebounceWrapper() {
