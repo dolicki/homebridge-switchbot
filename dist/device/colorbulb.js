@@ -4,7 +4,6 @@ exports.ColorBulb = void 0;
 const undici_1 = require("undici");
 const utils_1 = require("../utils");
 const rxjs_1 = require("rxjs");
-const operators_1 = require("rxjs/operators");
 const settings_1 = require("../settings");
 /**
  * Platform Accessory
@@ -220,22 +219,21 @@ class ColorBulb {
     /**
      * Asks the SwitchBot API for the latest device information
      */
-    async refreshStatus() {
-        if (!this.device.enableCloudService && this.OpenAPI) {
-            this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} refreshStatus enableCloudService: ${this.device.enableCloudService}`);
-        }
-        else if (this.BLE) {
-            await this.BLERefreshStatus();
-        }
-        else if (this.OpenAPI && this.platform.config.credentials?.token) {
-            //await this.openAPIRefreshStatus();
-        }
-        else {
-            await this.offlineOff();
-            this.debugWarnLog(`${this.device.deviceType}: ${this.accessory.displayName} Connection Type:` +
-                ` ${this.device.connectionType}, refreshStatus will not happen.`);
-        }
-    }
+    // async refreshStatus(): Promise<void> {
+    //   if (!this.device.enableCloudService && this.OpenAPI) {
+    //     this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} refreshStatus enableCloudService: ${this.device.enableCloudService}`);
+    //   } else if (this.BLE) {
+    //     await this.BLERefreshStatus();
+    //   } else if (this.OpenAPI && this.platform.config.credentials?.token) {
+    //     //await this.openAPIRefreshStatus();
+    //   } else {
+    //     await this.offlineOff();
+    //     this.debugWarnLog(
+    //       `${this.device.deviceType}: ${this.accessory.displayName} Connection Type:` +
+    //         ` ${this.device.connectionType}, refreshStatus will not happen.`,
+    //     );
+    //   }
+    // }
     async BLERefreshStatus() {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} BLERefreshStatus`);
         const switchbot = await this.platform.connectBLE();
@@ -344,25 +342,25 @@ class ColorBulb {
      *
      */
     async pushChanges() {
-        if (!this.device.enableCloudService && this.OpenAPI) {
-            this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} pushChanges enableCloudService: ${this.device.enableCloudService}`);
-        } /* if (this.BLE) {
-          await this.BLEpushChanges();
-        } else*/
-        else if (this.OpenAPI && this.platform.config.credentials?.token) {
-            //await this.openAPIpushChanges();
-        }
-        else {
-            await this.offlineOff();
-            this.debugWarnLog(`${this.device.deviceType}: ${this.accessory.displayName} Connection Type:` + ` ${this.device.connectionType}, pushChanges will not happen.`);
-        }
+        // if (!this.device.enableCloudService && this.OpenAPI) {
+        //   this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} pushChanges enableCloudService: ${this.device.enableCloudService}`);
+        // } /* if (this.BLE) {
+        //   await this.BLEpushChanges();
+        // } else*/ else if (this.OpenAPI && this.platform.config.credentials?.token) {
+        //   //await this.openAPIpushChanges();
+        // } else {
+        //   await this.offlineOff();
+        //   this.debugWarnLog(
+        //     `${this.device.deviceType}: ${this.accessory.displayName} Connection Type:` + ` ${this.device.connectionType}, pushChanges will not happen.`,
+        //   );
+        // }
         // Refresh the status from the API
-        (0, rxjs_1.interval)(15000)
-            .pipe((0, operators_1.skipWhile)(() => this.colorBulbUpdateInProgress))
-            .pipe((0, operators_1.take)(1))
-            .subscribe(async () => {
-            //await this.refreshStatus();
-        });
+        // interval(15000)
+        //   .pipe(skipWhile(() => this.colorBulbUpdateInProgress))
+        //   .pipe(take(1))
+        //   .subscribe(async () => {
+        //     //await this.refreshStatus();
+        //   });
     }
     async BLEpushChanges() {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} BLEpushChanges`);
@@ -694,13 +692,12 @@ class ColorBulb {
      * Handle requests to set the value of the "On" characteristic
      */
     async OnSet(value) {
-        if (this.On === this.accessory.context.On) {
+        if (this.On === value) {
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No Changes, Set On: ${value}`);
         }
         else {
             this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set On: ${value}`);
         }
-        this.On = value;
         await this.pushOnOffCommand(value);
         //this.doColorBulbUpdate.next();
     }
@@ -719,6 +716,7 @@ class ColorBulb {
         }
         this.Brightness = value;
         await this.pushBrightnessChanges();
+        await this.updateHomeKitCharacteristics();
         //this.doColorBulbUpdate.next();
     }
     /**

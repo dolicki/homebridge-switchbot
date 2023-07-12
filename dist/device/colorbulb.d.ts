@@ -64,7 +64,6 @@ export declare class ColorBulb {
     /**
      * Asks the SwitchBot API for the latest device information
      */
-    refreshStatus(): Promise<void>;
     BLERefreshStatus(): Promise<void>;
     openAPIRefreshStatus(): Promise<void>;
     /**
