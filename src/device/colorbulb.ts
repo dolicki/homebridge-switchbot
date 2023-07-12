@@ -522,13 +522,13 @@ export class ColorBulb {
     this.brightnessDebounce = value;
 
     const debouncedEventListener = debounce(this.brightnessSetDebounceWrapper, 5000);
-    debouncedEventListener();
+    debouncedEventListener(this);
   }
 
-  async brightnessSetDebounceWrapper() {
-    await this.pushBrightnessChanges(this.brightnessDebounce);
+  async brightnessSetDebounceWrapper(_this) {
+    await _this.pushBrightnessChanges(this.brightnessDebounce);
     this.Brightness = this.brightnessDebounce;
-    await this.updateHomeKitCharacteristics();
+    await _this.updateHomeKitCharacteristics();
   }
 
   /**
