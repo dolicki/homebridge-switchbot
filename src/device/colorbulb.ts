@@ -523,13 +523,13 @@ export class ColorBulb {
 
     this.infoLog(`BrightnessSet - value: ${value}`);
     this.brightnessDebounce = value;
-    await this.handler();
+    await this.handler(this);
   }
 
-  async brightnessSetDebounceWrapper() {
-    await this.pushBrightnessChanges(this.brightnessDebounce);
-    this.Brightness = this.brightnessDebounce;
-    await this.updateHomeKitCharacteristics();
+  async brightnessSetDebounceWrapper(_this) {
+    await _this.pushBrightnessChanges(_this.brightnessDebounce);
+    _this.Brightness = _this.brightnessDebounce;
+    await _this.updateHomeKitCharacteristics();
   }
 
   /**
