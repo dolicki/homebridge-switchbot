@@ -133,7 +133,7 @@ class ColorBulb {
         this.doColorBulbUpdate
             .pipe((0, operators_1.tap)(() => {
             this.colorBulbUpdateInProgress = true;
-        }), (0, operators_1.debounceTime)(this.platform.config.options.pushRate * 1000))
+        }))
             .subscribe(async () => {
             try {
                 await this.pushChanges();
@@ -248,7 +248,7 @@ class ColorBulb {
             await this.BLERefreshStatus();
         }
         else if (this.OpenAPI && this.platform.config.credentials?.token) {
-            await this.openAPIRefreshStatus();
+            //await this.openAPIRefreshStatus();
         }
         else {
             await this.offlineOff();
@@ -369,7 +369,7 @@ class ColorBulb {
           await this.BLEpushChanges();
         } else*/
         else if (this.OpenAPI && this.platform.config.credentials?.token) {
-            await this.openAPIpushChanges();
+            //await this.openAPIpushChanges();
         }
         else {
             await this.offlineOff();
@@ -380,7 +380,7 @@ class ColorBulb {
             .pipe((0, operators_1.skipWhile)(() => this.colorBulbUpdateInProgress))
             .pipe((0, operators_1.take)(1))
             .subscribe(async () => {
-            await this.refreshStatus();
+            //await this.refreshStatus();
         });
     }
     async BLEpushChanges() {
@@ -729,7 +729,8 @@ class ColorBulb {
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Set Brightness: ${value}`);
         }
         this.Brightness = value;
-        this.doColorBulbUpdate.next();
+        await this.pushBrightnessChanges();
+        //this.doColorBulbUpdate.next();
     }
     /**
      * Handle requests to set the value of the "ColorTemperature" characteristic

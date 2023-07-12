@@ -206,7 +206,7 @@ export class ColorBulb {
         tap(() => {
           this.colorBulbUpdateInProgress = true;
         }),
-        debounceTime(this.platform.config.options!.pushRate! * 1000),
+        //debounceTime(this.platform.config.options!.pushRate! * 1000),
       )
       .subscribe(async () => {
         try {
@@ -343,7 +343,7 @@ export class ColorBulb {
     } else if (this.BLE) {
       await this.BLERefreshStatus();
     } else if (this.OpenAPI && this.platform.config.credentials?.token) {
-      await this.openAPIRefreshStatus();
+      //await this.openAPIRefreshStatus();
     } else {
       await this.offlineOff();
       this.debugWarnLog(
@@ -471,7 +471,7 @@ export class ColorBulb {
     } /* if (this.BLE) {
       await this.BLEpushChanges();
     } else*/ else if (this.OpenAPI && this.platform.config.credentials?.token) {
-      await this.openAPIpushChanges();
+      //await this.openAPIpushChanges();
     } else {
       await this.offlineOff();
       this.debugWarnLog(
@@ -483,7 +483,7 @@ export class ColorBulb {
       .pipe(skipWhile(() => this.colorBulbUpdateInProgress))
       .pipe(take(1))
       .subscribe(async () => {
-        await this.refreshStatus();
+        //await this.refreshStatus();
       });
   }
 
@@ -858,7 +858,8 @@ export class ColorBulb {
     }
 
     this.Brightness = value;
-    this.doColorBulbUpdate.next();
+    await this.pushBrightnessChanges();
+    //this.doColorBulbUpdate.next();
   }
 
   /**
