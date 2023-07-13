@@ -412,12 +412,12 @@ class ColorBulb {
     async BrightnessSet(value) {
         this.infoLog(`BrightnessSet - value: ${value}`);
         this.brightnessDebounce = value;
-        await this.brightnessDebounceHandler(this, value);
+        await this.brightnessDebounceHandler(value);
     }
     async brightnessSetDebounceWrapper(value) {
-        this.updateHomeKitCharacteristics();
-        console.log(`BULB API CALL: ${value}`);
-        this.pushBrightnessChanges(value);
+        this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} - API CALL: ${value}`);
+        await this.pushBrightnessChanges(value);
+        await this.updateHomeKitCharacteristics();
     }
     /**
      * Handle requests to set the value of the "ColorTemperature" characteristic

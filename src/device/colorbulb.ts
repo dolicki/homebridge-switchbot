@@ -516,13 +516,13 @@ export class ColorBulb {
   async BrightnessSet(value: CharacteristicValue): Promise<void> {
     this.infoLog(`BrightnessSet - value: ${value}`);
     this.brightnessDebounce = value;
-    await this.brightnessDebounceHandler(this, value);
+    await this.brightnessDebounceHandler(value);
   }
 
   async brightnessSetDebounceWrapper(value) {
-    this.updateHomeKitCharacteristics();
-    console.log(`BULB API CALL: ${value}`);
-    this.pushBrightnessChanges(value);
+    this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} - API CALL: ${value}`);
+    await this.pushBrightnessChanges(value);
+    await this.updateHomeKitCharacteristics();
   }
 
   /**
@@ -604,8 +604,8 @@ export class ColorBulb {
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Brightness: ${this.Brightness}`);
     } else {
       this.accessory.context.Brightness = this.Brightness;
-      this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Brightness, this.brightnessDebounce);
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Brightness: ${this.brightnessDebounce}`);
+      this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Brightness, this.Brightness);
+      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Brightness: ${this.Brightness}`);
     }
     // if (this.ColorTemperature === undefined) {
     //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} ColorTemperature: ${this.ColorTemperature}`);
