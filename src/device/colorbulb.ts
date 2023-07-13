@@ -503,9 +503,9 @@ export class ColorBulb {
         headers: this.platform.generateHeaders(),
       });
       const deviceStatus = await body.json();
-      this.debugLog(`Devices: ${JSON.stringify(deviceStatus.body)}`);
+      // this.debugLog(`Devices: ${JSON.stringify(deviceStatus.body)}`);
       this.statusCode(statusCode);
-      this.debugLog(`Headers: ${JSON.stringify(headers)}`);
+      // this.debugLog(`Headers: ${JSON.stringify(headers)}`);
       this.Brightness = value;
     } catch (e: any) {
       this.apiError(e);
