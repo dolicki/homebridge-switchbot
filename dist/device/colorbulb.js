@@ -309,6 +309,7 @@ class ColorBulb {
             //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
             this.statusCode(statusCode);
             this.On = value;
+            await this.updateHomeKitCharacteristics();
             //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
         }
         catch (e) {
@@ -417,7 +418,6 @@ class ColorBulb {
     async OnSet(value) {
         this.infoLog(`OnSet - value: ${value}`);
         await this.pushOnOffCommand(value);
-        await this.updateHomeKitCharacteristics();
     }
     async BrightnessSet(value) {
         this.infoLog(`BrightnessSet - value: ${value}`);

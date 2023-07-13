@@ -399,6 +399,7 @@ export class ColorBulb {
       //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
       this.statusCode(statusCode);
       this.On = value;
+      await this.updateHomeKitCharacteristics();
       //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
     } catch (e: any) {
       this.apiError(e);
@@ -517,7 +518,6 @@ export class ColorBulb {
   async OnSet(value: CharacteristicValue): Promise<void> {
     this.infoLog(`OnSet - value: ${value}`);
     await this.pushOnOffCommand(value);
-    await this.updateHomeKitCharacteristics();
   }
 
   /**
