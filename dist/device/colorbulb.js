@@ -33,7 +33,7 @@ class ColorBulb {
         /**
          * Handle requests to set the value of the "Brightness" characteristic
          */
-        this.brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper.bind(this), 350);
+        this.brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper.bind(this), 500);
         // default placeholders
         this.init(device, accessory, platform);
     }
@@ -309,7 +309,7 @@ class ColorBulb {
             //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
             this.statusCode(statusCode);
             this.On = value;
-            await this.updateHomeKitCharacteristics();
+            //await this.updateHomeKitCharacteristics();
             //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
         }
         catch (e) {
