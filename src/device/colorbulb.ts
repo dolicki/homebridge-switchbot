@@ -532,9 +532,9 @@ export class ColorBulb {
   }
 
   async brightnessSetDebounceWrapper(value) {
+    this.updateHomeKitCharacteristics();
     this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} - API CALL: ${value}`);
-    await this.pushBrightnessChanges(value);
-    await this.updateHomeKitCharacteristics();
+    this.pushBrightnessChanges(value);
   }
 
   /**

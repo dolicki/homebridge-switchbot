@@ -421,9 +421,9 @@ class ColorBulb {
         await this.brightnessDebounceHandler(value);
     }
     async brightnessSetDebounceWrapper(value) {
+        this.updateHomeKitCharacteristics();
         this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} - API CALL: ${value}`);
-        await this.pushBrightnessChanges(value);
-        await this.updateHomeKitCharacteristics();
+        this.pushBrightnessChanges(value);
     }
     /**
      * Handle requests to set the value of the "ColorTemperature" characteristic
