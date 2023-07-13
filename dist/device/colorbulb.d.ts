@@ -96,7 +96,9 @@ export declare class ColorBulb {
     /**
      * Handle requests to set the value of the "Hue" characteristic
      */
+    hueDebounceHandler: (...args: any[]) => void;
     HueSet(value: CharacteristicValue): Promise<void>;
+    hueSetDebounceWrapper(value: any): Promise<void>;
     /**
      * Handle requests to set the value of the "Saturation" characteristic
      */

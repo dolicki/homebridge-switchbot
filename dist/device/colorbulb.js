@@ -34,6 +34,10 @@ class ColorBulb {
          * Handle requests to set the value of the "Brightness" characteristic
          */
         this.brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper.bind(this), 375);
+        /**
+         * Handle requests to set the value of the "Hue" characteristic
+         */
+        this.hueDebounceHandler = debounce(this.hueSetDebounceWrapper.bind(this), 375);
         // default placeholders
         this.init(device, accessory, platform);
     }
@@ -116,40 +120,42 @@ class ColorBulb {
         //     return this.ColorTemperature!;
         //   })
         //   .onSet(this.ColorTemperatureSet.bind(this));
-        // // handle Hue events using the Hue characteristic
-        // this.lightBulbService
-        //   .getCharacteristic(this.platform.Characteristic.Hue)
-        //   .setProps({
-        //     minValue: 0,
-        //     maxValue: 360,
-        //     validValueRanges: [0, 360],
-        //   })
-        //   .onGet(() => {
-        //     return this.Hue;
-        //   })
-        //   .onSet(this.HueSet.bind(this));
-        // // handle Hue events using the Hue characteristic
-        // this.lightBulbService
-        //   .getCharacteristic(this.platform.Characteristic.Saturation)
-        //   .setProps({
-        //     minValue: 0,
-        //     maxValue: 100,
-        //     validValueRanges: [0, 100],
-        //   })
-        //   .onGet(() => {
-        //     return this.Saturation;
-        //   })
-        //   .onSet(this.SaturationSet.bind(this));
-        this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} adaptiveLightingShift: ${this.adaptiveLightingShift}`);
-        if (this.adaptiveLightingShift !== -1) {
-            this.AdaptiveLightingController = new platform.api.hap.AdaptiveLightingController(this.lightBulbService, {
-                customTemperatureAdjustment: this.adaptiveLightingShift,
-            });
-            this.accessory.configureController(this.AdaptiveLightingController);
-            this.accessory.context.adaptiveLighting = true;
-            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} adaptiveLighting: ${this.accessory.context.adaptiveLighting},` +
-                ` adaptiveLightingShift: ${this.adaptiveLightingShift}`);
-        }
+        // handle Hue events using the Hue characteristic
+        this.lightBulbService
+            .getCharacteristic(this.platform.Characteristic.Hue)
+            .setProps({
+            minValue: 0,
+            maxValue: 360,
+            validValueRanges: [0, 360],
+        })
+            .onGet(() => {
+            return this.Hue;
+        })
+            .onSet(this.HueSet.bind(this));
+        // handle Hue events using the Hue characteristic
+        this.lightBulbService
+            .getCharacteristic(this.platform.Characteristic.Saturation)
+            .setProps({
+            minValue: 0,
+            maxValue: 100,
+            validValueRanges: [0, 100],
+        })
+            .onGet(() => {
+            return this.Saturation;
+        })
+            .onSet(this.SaturationSet.bind(this));
+        // this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} adaptiveLightingShift: ${this.adaptiveLightingShift}`);
+        // if (this.adaptiveLightingShift !== -1) {
+        //   this.AdaptiveLightingController = new platform.api.hap.AdaptiveLightingController(this.lightBulbService, {
+        //     customTemperatureAdjustment: this.adaptiveLightingShift,
+        //   });
+        //   this.accessory.configureController(this.AdaptiveLightingController);
+        //   this.accessory.context.adaptiveLighting = true;
+        //   this.debugLog(
+        //     `${this.device.deviceType}: ${this.accessory.displayName} adaptiveLighting: ${this.accessory.context.adaptiveLighting},` +
+        //       ` adaptiveLightingShift: ${this.adaptiveLightingShift}`,
+        //   );
+        // }
     }
     /**
      * Parse the device status from the SwitchBot api
@@ -218,23 +224,21 @@ class ColorBulb {
         this.Brightness = Number(this.brightness);
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Brightness: ${this.Brightness}`);
         // Color, Hue & Brightness
-        // if (this.color) {
-        //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} color: ${JSON.stringify(this.color)}`);
-        //   const [red, green, blue] = this.color!.split(":");
-        //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} red: ${JSON.stringify(red)}`);
-        //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} green: ${JSON.stringify(green)}`);
-        //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} blue: ${JSON.stringify(blue)}`);
-        //   const [hue, saturation] = rgb2hs(Number(red), Number(green), Number(blue));
-        //   this.debugLog(
-        //     `${this.device.deviceType}: ${this.accessory.displayName}` + ` hs: ${JSON.stringify(rgb2hs(Number(red), Number(green), Number(blue)))}`,
-        //   );
-        //   // Hue
-        //   this.Hue = hue;
-        //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${this.Hue}`);
-        //   // Saturation
-        //   this.Saturation = saturation;
-        //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation: ${this.Saturation}`);
-        // }
+        if (this.color) {
+            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} color: ${JSON.stringify(this.color)}`);
+            const [red, green, blue] = this.color.split(":");
+            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} red: ${JSON.stringify(red)}`);
+            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} green: ${JSON.stringify(green)}`);
+            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} blue: ${JSON.stringify(blue)}`);
+            const [hue, saturation] = (0, settings_1.rgb2hs)(Number(red), Number(green), Number(blue));
+            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName}` + ` hs: ${JSON.stringify((0, settings_1.rgb2hs)(Number(red), Number(green), Number(blue)))}`);
+            // Hue
+            this.Hue = hue;
+            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${this.Hue}`);
+            // Saturation
+            this.Saturation = saturation;
+            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation: ${this.Saturation}`);
+        }
         // ColorTemperature
         // if (!Number.isNaN(this.colorTemperature)) {
         //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} OpenAPI ColorTemperature: ${this.colorTemperature}`);
@@ -454,39 +458,29 @@ class ColorBulb {
         this.ColorTemperature = value;
         //this.doColorBulbUpdate.next();
     }
-    /**
-     * Handle requests to set the value of the "Hue" characteristic
-     */
     async HueSet(value) {
-        if (this.Hue === this.accessory.context.Hue) {
-            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No Changes, Set Hue: ${value}`);
-        }
-        else if (this.On) {
-            this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set Hue: ${value}`);
-        }
-        else {
-            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Set Hue: ${value}`);
-        }
-        this.lightBulbService.updateCharacteristic(this.platform.Characteristic.ColorTemperature, 140);
-        this.Hue = value;
-        //this.doColorBulbUpdate.next();
+        this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue - value: ${value}`);
+        //this.hueDebounceHandler(value);
+    }
+    async hueSetDebounceWrapper(value) {
+        //this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} - API CALL: ${value}`);
+        //await this.pushHueSaturationChanges(value);
     }
     /**
      * Handle requests to set the value of the "Saturation" characteristic
      */
     async SaturationSet(value) {
-        if (this.Saturation === this.accessory.context.Saturation) {
-            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No Changes, Set Saturation: ${value}`);
-        }
-        else if (this.On) {
-            this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set Saturation: ${value}`);
-        }
-        else {
-            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Set Saturation: ${value}`);
-        }
-        this.lightBulbService.updateCharacteristic(this.platform.Characteristic.ColorTemperature, 140);
-        this.Saturation = value;
-        //this.doColorBulbUpdate.next();
+        // if (this.Saturation === this.accessory.context.Saturation) {
+        //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No Changes, Set Saturation: ${value}`);
+        // } else if (this.On) {
+        //   this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set Saturation: ${value}`);
+        // } else {
+        //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Set Saturation: ${value}`);
+        // }
+        // this.lightBulbService.updateCharacteristic(this.platform.Characteristic.ColorTemperature, 140);
+        // this.Saturation = value;
+        // //this.doColorBulbUpdate.next();
+        this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation - value: ${value}`);
     }
     async updateHomeKitCharacteristics() {
         if (this.On === undefined) {
