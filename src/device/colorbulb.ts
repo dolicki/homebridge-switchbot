@@ -602,6 +602,7 @@ export class ColorBulb {
     // this.Hue = data.saturation;
     // this.Saturation = data.saturation;
     await this.pushHueSaturationChanges();
+    await this.updateHomeKitCharacteristics();
   }
 
   async updateHomeKitCharacteristics(): Promise<void> {
@@ -626,20 +627,20 @@ export class ColorBulb {
     //   this.lightBulbService.updateCharacteristic(this.platform.Characteristic.ColorTemperature, this.ColorTemperature);
     //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic ColorTemperature: ${this.ColorTemperature}`);
     // }
-    // if (this.Hue === undefined) {
-    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${this.Hue}`);
-    // } else {
-    //   this.accessory.context.Hue = this.Hue;
-    //   this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Hue, this.Hue);
-    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Hue: ${this.Hue}`);
-    // }
-    // if (this.Saturation === undefined) {
-    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation: ${this.Saturation}`);
-    // } else {
-    //   this.accessory.context.Saturation = this.Saturation;
-    //   this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Saturation, this.Saturation);
-    //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Saturation: ${this.Saturation}`);
-    // }
+    if (this.Hue === undefined) {
+      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${this.Hue}`);
+    } else {
+      this.accessory.context.Hue = this.Hue;
+      this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Hue, this.Hue);
+      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Hue: ${this.Hue}`);
+    }
+    if (this.Saturation === undefined) {
+      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation: ${this.Saturation}`);
+    } else {
+      this.accessory.context.Saturation = this.Saturation;
+      this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Saturation, this.Saturation);
+      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Saturation: ${this.Saturation}`);
+    }
   }
 
   async adaptiveLighting(device: device & devicesConfig): Promise<void> {
