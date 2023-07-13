@@ -169,43 +169,43 @@ export class ColorBulb {
       .onSet(this.BrightnessSet.bind(this));
 
     // handle ColorTemperature events using the ColorTemperature characteristic
-    // this.lightBulbService
-    //   .getCharacteristic(this.platform.Characteristic.ColorTemperature)
-    //   .setProps({
-    //     minValue: 140,
-    //     maxValue: 500,
-    //     validValueRanges: [140, 500],
-    //   })
-    //   .onGet(() => {
-    //     return this.ColorTemperature!;
-    //   })
-    //   .onSet(this.ColorTemperatureSet.bind(this));
+    this.lightBulbService
+      .getCharacteristic(this.platform.Characteristic.ColorTemperature)
+      .setProps({
+        minValue: 140,
+        maxValue: 500,
+        validValueRanges: [140, 500],
+      })
+      .onGet(() => {
+        return this.ColorTemperature!;
+      })
+      .onSet(this.ColorTemperatureSet.bind(this));
 
     // handle Hue events using the Hue characteristic
-    // this.lightBulbService
-    //   .getCharacteristic(this.platform.Characteristic.Hue)
-    //   .setProps({
-    //     minValue: 0,
-    //     maxValue: 360,
-    //     validValueRanges: [0, 360],
-    //   })
-    //   .onGet(() => {
-    //     return this.Hue;
-    //   })
-    //   .onSet(this.HueSet.bind(this));
+    this.lightBulbService
+      .getCharacteristic(this.platform.Characteristic.Hue)
+      .setProps({
+        minValue: 0,
+        maxValue: 360,
+        validValueRanges: [0, 360],
+      })
+      .onGet(() => {
+        return this.Hue;
+      })
+      .onSet(this.HueSet.bind(this));
     // handle Hue events using the Hue characteristic
 
-    // this.lightBulbService
-    //   .getCharacteristic(this.platform.Characteristic.Saturation)
-    //   .setProps({
-    //     minValue: 0,
-    //     maxValue: 100,
-    //     validValueRanges: [0, 100],
-    //   })
-    //   .onGet(() => {
-    //     return this.Saturation;
-    //   })
-    //   .onSet(this.SaturationSet.bind(this));
+    this.lightBulbService
+      .getCharacteristic(this.platform.Characteristic.Saturation)
+      .setProps({
+        minValue: 0,
+        maxValue: 100,
+        validValueRanges: [0, 100],
+      })
+      .onGet(() => {
+        return this.Saturation;
+      })
+      .onSet(this.SaturationSet.bind(this));
 
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} adaptiveLightingShift: ${this.adaptiveLightingShift}`);
     if (this.adaptiveLightingShift !== -1) {
