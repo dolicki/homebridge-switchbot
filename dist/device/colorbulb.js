@@ -37,7 +37,7 @@ class ColorBulb {
         /**
          * Handle requests to set the value of the "Hue" characteristic
          */
-        this.hueAndSaturationDebounceHandler = debounce(this.hueAndSaturationSetDebounceWrapper.bind(this), 100);
+        this.hueAndSaturationDebounceHandler = debounce(this.hueAndSaturationSetDebounceWrapper.bind(this), 200);
         // default placeholders
         this.init(device, accessory, platform);
     }
@@ -109,17 +109,17 @@ class ColorBulb {
         })
             .onSet(this.BrightnessSet.bind(this));
         // handle ColorTemperature events using the ColorTemperature characteristic
-        this.lightBulbService
-            .getCharacteristic(this.platform.Characteristic.ColorTemperature)
-            .setProps({
-            minValue: 140,
-            maxValue: 500,
-            validValueRanges: [140, 500],
-        })
-            .onGet(() => {
-            return this.ColorTemperature;
-        })
-            .onSet(this.ColorTemperatureSet.bind(this));
+        // this.lightBulbService
+        //   .getCharacteristic(this.platform.Characteristic.ColorTemperature)
+        //   .setProps({
+        //     minValue: 140,
+        //     maxValue: 500,
+        //     validValueRanges: [140, 500],
+        //   })
+        //   .onGet(() => {
+        //     return this.ColorTemperature!;
+        //   })
+        //   .onSet(this.ColorTemperatureSet.bind(this));
         // handle Hue events using the Hue characteristic
         this.lightBulbService
             .getCharacteristic(this.platform.Characteristic.Hue)
@@ -485,7 +485,7 @@ class ColorBulb {
         this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue and Saturation - value: ${this.Hue}, ${this.Saturation}`);
         // this.Hue = data.saturation;
         // this.Saturation = data.saturation;
-        await this.updateHueAndSaturationCharacteristics();
+        //await this.updateHueAndSaturationCharacteristics();
         await this.pushHueSaturationChanges();
     }
     async updateHomeKitCharacteristics() {
