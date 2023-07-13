@@ -37,7 +37,7 @@ class ColorBulb {
         /**
          * Handle requests to set the value of the "Hue" characteristic
          */
-        this.hueAndSaturationDebounceHandler = debounce(this.hueAndSaturationSetDebounceWrapper.bind(this), 500);
+        this.hueAndSaturationDebounceHandler = debounce(this.hueAndSaturationSetDebounceWrapper.bind(this), 100);
         // default placeholders
         this.init(device, accessory, platform);
     }
@@ -323,10 +323,10 @@ class ColorBulb {
         }
     }
     async pushHueSaturationChanges() {
-        this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} pushHueSaturationChanges`);
+        this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} pushHueSaturationChanges`);
         // if (this.Hue !== this.accessory.context.Hue || this.Saturation !== this.accessory.context.Saturation) {
-        this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${JSON.stringify(this.Hue)}`);
-        this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation: ${JSON.stringify(this.Saturation)}`);
+        //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${JSON.stringify(this.Hue)}`);
+        //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation: ${JSON.stringify(this.Saturation)}`);
         const [red, green, blue] = (0, settings_1.hs2rgb)(Number(this.Hue), Number(this.Saturation));
         this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} rgb: ${JSON.stringify([red, green, blue])}`);
         const bodyChange = JSON.stringify({
@@ -342,9 +342,9 @@ class ColorBulb {
                 headers: this.platform.generateHeaders(),
             });
             const deviceStatus = await body.json();
-            this.debugLog(`Devices: ${JSON.stringify(deviceStatus.body)}`);
+            //this.debugLog(`Devices: ${JSON.stringify(deviceStatus.body)}`);
             this.statusCode(statusCode);
-            this.debugLog(`Headers: ${JSON.stringify(headers)}`);
+            //this.debugLog(`Headers: ${JSON.stringify(headers)}`);
         }
         catch (e) {
             this.apiError(e);
@@ -485,8 +485,8 @@ class ColorBulb {
         this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue and Saturation - value: ${this.Hue}, ${this.Saturation}`);
         // this.Hue = data.saturation;
         // this.Saturation = data.saturation;
-        await this.pushHueSaturationChanges();
         await this.updateHomeKitCharacteristics();
+        await this.pushHueSaturationChanges();
     }
     async updateHomeKitCharacteristics() {
         if (this.On === undefined) {
