@@ -321,6 +321,7 @@ class ColorBulb {
         }
     }
     async pushHueSaturationChanges() {
+        return;
         this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} pushHueSaturationChanges`);
         // if (this.Hue !== this.accessory.context.Hue || this.Saturation !== this.accessory.context.Saturation) {
         //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${JSON.stringify(this.Hue)}`);
@@ -351,6 +352,7 @@ class ColorBulb {
         }
     }
     async pushColorTemperatureChanges() {
+        return;
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} pushColorTemperatureChanges`);
         // if (this.ColorTemperature !== this.accessory.context.ColorTemperature) {
         const kelvin = Math.round(1000000 / Number(this.ColorTemperature));
@@ -503,6 +505,7 @@ class ColorBulb {
             this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Brightness, this.Brightness);
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Brightness: ${this.Brightness}`);
         }
+        await this.updateHueAndSaturationCharacteristics();
         // if (this.ColorTemperature === undefined) {
         //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} ColorTemperature: ${this.ColorTemperature}`);
         // } else {
