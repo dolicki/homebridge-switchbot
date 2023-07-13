@@ -82,7 +82,7 @@ export class ColorBulb {
   colorBulbUpdateInProgress!: boolean;
   doColorBulbUpdate!: Subject<void>;
 
-  lastUpdateCharacteristic: number = Date.now();
+  lastApiUpdate: number = Date.now();
 
   // Connection
   private readonly BLE = this.device.connectionType === "BLE" || this.device.connectionType === "BLE/OpenAPI";
@@ -130,7 +130,7 @@ export class ColorBulb {
     await this.openAPIRefreshStatus();
     setInterval(() => {
       this.openAPIRefreshStatus();
-    }, 2 * 60 * 1000);
+    }, 5 * 60 * 1000);
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -145,8 +145,9 @@ export class ColorBulb {
     // handle on / off events using the On characteristic
     this.lightBulbService
       .getCharacteristic(this.platform.Characteristic.On)
-      .onGet(() => {
+      .onGet(async () => {
         this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Get Bulb Status: ${this.On}`);
+        await this.openAPIRefreshStatus();
         return this.On;
       })
       .onSet(this.OnSet.bind(this));
@@ -331,6 +332,10 @@ export class ColorBulb {
   }
 
   async openAPIRefreshStatus() {
+    if (Date.now() - this.lastApiUpdate < 30000) {
+      return;
+    }
+    this.lastApiUpdate = Date.now();
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} openAPIRefreshStatus`);
     try {
       const { body, statusCode, headers } = await request(`${Devices}/${this.device.deviceId}/status`, {
@@ -340,7 +345,7 @@ export class ColorBulb {
       //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
       this.statusCode(statusCode);
       //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} refreshStatus: ${JSON.stringify(deviceStatus)}`);
+      this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} refreshStatus: ${JSON.stringify(deviceStatus)}`);
       this.power = deviceStatus.body.power;
       this.color = deviceStatus.body.color;
       this.brightness = deviceStatus.body.brightness;
@@ -519,7 +524,7 @@ export class ColorBulb {
   /**
    * Handle requests to set the value of the "Brightness" characteristic
    */
-  brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper.bind(this), 500);
+  brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper.bind(this), 375);
 
   async BrightnessSet(value: CharacteristicValue): Promise<void> {
     this.infoLog(`BrightnessSet - value: ${value}`);
@@ -600,7 +605,6 @@ export class ColorBulb {
   }
 
   async updateHomeKitCharacteristics(): Promise<void> {
-    this.lastUpdateCharacteristic = Date.now();
     if (this.On === undefined) {
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
     } else {

@@ -52,7 +52,7 @@ export declare class ColorBulb {
     cacheKelvin: number;
     colorBulbUpdateInProgress: boolean;
     doColorBulbUpdate: Subject<void>;
-    lastUpdateCharacteristic: number;
+    lastApiUpdate: number;
     private readonly BLE;
     private readonly OpenAPI;
     constructor(platform: SwitchBotPlatform, accessory: PlatformAccessory, device: device & devicesConfig);

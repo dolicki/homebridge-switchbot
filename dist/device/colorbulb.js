@@ -26,14 +26,14 @@ class ColorBulb {
         this.platform = platform;
         this.accessory = accessory;
         this.device = device;
-        this.lastUpdateCharacteristic = Date.now();
+        this.lastApiUpdate = Date.now();
         // Connection
         this.BLE = this.device.connectionType === "BLE" || this.device.connectionType === "BLE/OpenAPI";
         this.OpenAPI = this.device.connectionType === "OpenAPI" || this.device.connectionType === "BLE/OpenAPI";
         /**
          * Handle requests to set the value of the "Brightness" characteristic
          */
-        this.brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper.bind(this), 500);
+        this.brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper.bind(this), 375);
         // default placeholders
         this.init(device, accessory, platform);
     }
@@ -70,7 +70,7 @@ class ColorBulb {
         await this.openAPIRefreshStatus();
         setInterval(() => {
             this.openAPIRefreshStatus();
-        }, 2 * 60 * 1000);
+        }, 5 * 60 * 1000);
         // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
         // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
         // accessory.getService('NAME') ?? accessory.addService(this.platform.Service.Outlet, 'NAME', 'USER_DEFINED_SUBTYPE');
@@ -83,8 +83,9 @@ class ColorBulb {
         // handle on / off events using the On characteristic
         this.lightBulbService
             .getCharacteristic(this.platform.Characteristic.On)
-            .onGet(() => {
+            .onGet(async () => {
             this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Get Bulb Status: ${this.On}`);
+            await this.openAPIRefreshStatus();
             return this.On;
         })
             .onSet(this.OnSet.bind(this));
@@ -244,6 +245,10 @@ class ColorBulb {
         // }
     }
     async openAPIRefreshStatus() {
+        if (Date.now() - this.lastApiUpdate < 30000) {
+            return;
+        }
+        this.lastApiUpdate = Date.now();
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} openAPIRefreshStatus`);
         try {
             const { body, statusCode, headers } = await (0, undici_1.request)(`${settings_1.Devices}/${this.device.deviceId}/status`, {
@@ -253,7 +258,7 @@ class ColorBulb {
             //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
             this.statusCode(statusCode);
             //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
-            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} refreshStatus: ${JSON.stringify(deviceStatus)}`);
+            this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} refreshStatus: ${JSON.stringify(deviceStatus)}`);
             this.power = deviceStatus.body.power;
             this.color = deviceStatus.body.color;
             this.brightness = deviceStatus.body.brightness;
@@ -486,7 +491,6 @@ class ColorBulb {
         //this.doColorBulbUpdate.next();
     }
     async updateHomeKitCharacteristics() {
-        this.lastUpdateCharacteristic = Date.now();
         if (this.On === undefined) {
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
         }
