@@ -245,7 +245,7 @@ class ColorBulb {
         // }
     }
     async openAPIRefreshStatus() {
-        if (Date.now() - this.lastApiUpdate < 30000) {
+        if (Date.now() - this.lastApiUpdate < 60000) {
             return;
         }
         this.lastApiUpdate = Date.now();
