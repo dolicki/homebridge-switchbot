@@ -37,7 +37,7 @@ class ColorBulb {
         /**
          * Handle requests to set the value of the "Hue" characteristic
          */
-        this.hueAndSaturationDebounceHandler = debounce(this.hueAndSaturationSetDebounceWrapper.bind(this), 5000);
+        this.hueAndSaturationDebounceHandler = debounce(this.hueAndSaturationSetDebounceWrapper.bind(this), 500);
         // default placeholders
         this.init(device, accessory, platform);
     }
@@ -328,7 +328,7 @@ class ColorBulb {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${JSON.stringify(this.Hue)}`);
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation: ${JSON.stringify(this.Saturation)}`);
         const [red, green, blue] = (0, settings_1.hs2rgb)(Number(this.Hue), Number(this.Saturation));
-        this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} rgb: ${JSON.stringify([red, green, blue])}`);
+        this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} rgb: ${JSON.stringify([red, green, blue])}`);
         const bodyChange = JSON.stringify({
             command: "setColor",
             parameter: `${red}:${green}:${blue}`,
@@ -471,7 +471,7 @@ class ColorBulb {
         this.Saturation = value;
         this.hueAndSaturationDebounceHandler();
     }
-    async hueAndSaturationSetDebounceWrapper(value) {
+    async hueAndSaturationSetDebounceWrapper() {
         // const data = {
         //   hue: 0,
         //   saturation: 0,
@@ -482,7 +482,7 @@ class ColorBulb {
         // if (value.saturation) {
         //   data.saturation = value.saturation;
         // }
-        // this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue and Saturation - value: ${JSON.stringify(data)}`);
+        this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue and Saturation - value: ${this.Hue}, ${this.Saturation}`);
         // this.Hue = data.saturation;
         // this.Saturation = data.saturation;
         await this.pushHueSaturationChanges();

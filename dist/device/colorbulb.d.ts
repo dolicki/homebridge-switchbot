@@ -102,7 +102,7 @@ export declare class ColorBulb {
      * Handle requests to set the value of the "Saturation" characteristic
      */
     SaturationSet(value: CharacteristicValue): Promise<void>;
-    hueAndSaturationSetDebounceWrapper(value: any): Promise<void>;
+    hueAndSaturationSetDebounceWrapper(): Promise<void>;
     updateHomeKitCharacteristics(): Promise<void>;
     adaptiveLighting(device: device & devicesConfig): Promise<void>;
     retry({ max, fn }: {
