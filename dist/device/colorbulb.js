@@ -37,7 +37,7 @@ class ColorBulb {
         /**
          * Handle requests to set the value of the "Hue" characteristic
          */
-        this.hueAndSaturationDebounceHandler = debounce(this.hueAndSaturationSetDebounceWrapper.bind(this), 750);
+        this.hueAndSaturationDebounceHandler = debounce(this.hueAndSaturationSetDebounceWrapper.bind(this), 5000);
         // default placeholders
         this.init(device, accessory, platform);
     }
@@ -460,29 +460,31 @@ class ColorBulb {
     }
     async HueSet(value) {
         this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue - value: ${value}`);
-        this.hueAndSaturationDebounceHandler({ hue: value });
+        this.Hue = value;
+        this.hueAndSaturationDebounceHandler();
     }
     /**
      * Handle requests to set the value of the "Saturation" characteristic
      */
     async SaturationSet(value) {
         this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation - value: ${value}`);
-        this.hueAndSaturationDebounceHandler({ saturation: value });
+        this.Saturation = value;
+        this.hueAndSaturationDebounceHandler();
     }
     async hueAndSaturationSetDebounceWrapper(value) {
-        const data = {
-            hue: 0,
-            saturation: 0,
-        };
-        if (value.hue) {
-            data.hue = value.hue;
-        }
-        if (value.saturation) {
-            data.saturation = value.saturation;
-        }
-        this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue and Saturation - value: ${JSON.stringify(data)}`);
-        this.Hue = data.saturation;
-        this.Saturation = data.saturation;
+        // const data = {
+        //   hue: 0,
+        //   saturation: 0,
+        // };
+        // if (value.hue) {
+        //   data.hue = value.hue;
+        // }
+        // if (value.saturation) {
+        //   data.saturation = value.saturation;
+        // }
+        // this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue and Saturation - value: ${JSON.stringify(data)}`);
+        // this.Hue = data.saturation;
+        // this.Saturation = data.saturation;
         await this.pushHueSaturationChanges();
     }
     async updateHomeKitCharacteristics() {

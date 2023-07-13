@@ -569,10 +569,11 @@ export class ColorBulb {
   /**
    * Handle requests to set the value of the "Hue" characteristic
    */
-  hueAndSaturationDebounceHandler = debounce(this.hueAndSaturationSetDebounceWrapper.bind(this), 750);
+  hueAndSaturationDebounceHandler = debounce(this.hueAndSaturationSetDebounceWrapper.bind(this), 5000);
   async HueSet(value: CharacteristicValue): Promise<void> {
     this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue - value: ${value}`);
-    this.hueAndSaturationDebounceHandler({ hue: value });
+    this.Hue = value;
+    this.hueAndSaturationDebounceHandler();
   }
 
   /**
@@ -580,25 +581,26 @@ export class ColorBulb {
    */
   async SaturationSet(value: CharacteristicValue): Promise<void> {
     this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation - value: ${value}`);
-    this.hueAndSaturationDebounceHandler({ saturation: value });
+    this.Saturation = value;
+    this.hueAndSaturationDebounceHandler();
   }
 
   async hueAndSaturationSetDebounceWrapper(value) {
-    const data = {
-      hue: 0,
-      saturation: 0,
-    };
+    // const data = {
+    //   hue: 0,
+    //   saturation: 0,
+    // };
 
-    if (value.hue) {
-      data.hue = value.hue;
-    }
-    if (value.saturation) {
-      data.saturation = value.saturation;
-    }
+    // if (value.hue) {
+    //   data.hue = value.hue;
+    // }
+    // if (value.saturation) {
+    //   data.saturation = value.saturation;
+    // }
 
-    this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue and Saturation - value: ${JSON.stringify(data)}`);
-    this.Hue = data.saturation;
-    this.Saturation = data.saturation;
+    // this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue and Saturation - value: ${JSON.stringify(data)}`);
+    // this.Hue = data.saturation;
+    // this.Saturation = data.saturation;
     await this.pushHueSaturationChanges();
   }
 
