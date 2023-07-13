@@ -132,7 +132,7 @@ export class ColorBulb {
 
     await this.updateHomeKitCharacteristics();
     setInterval(() => {
-      this.openAPIRefreshStatus();
+      this.updateHomeKitCharacteristics();
     }, 15 * 1000);
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
