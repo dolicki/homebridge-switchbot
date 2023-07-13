@@ -37,7 +37,7 @@ class ColorBulb {
         /**
          * Handle requests to set the value of the "Hue" characteristic
          */
-        this.hueDebounceHandler = debounce(this.hueSetDebounceWrapper.bind(this), 375);
+        this.hueAndSaturationDebounceHandler = debounce(this.hueAndSaturationSetDebounceWrapper.bind(this), 750);
         // default placeholders
         this.init(device, accessory, platform);
     }
@@ -460,27 +460,30 @@ class ColorBulb {
     }
     async HueSet(value) {
         this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue - value: ${value}`);
-        //this.hueDebounceHandler(value);
-    }
-    async hueSetDebounceWrapper(value) {
-        //this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} - API CALL: ${value}`);
-        //await this.pushHueSaturationChanges(value);
+        this.hueAndSaturationDebounceHandler({ hue: value });
     }
     /**
      * Handle requests to set the value of the "Saturation" characteristic
      */
     async SaturationSet(value) {
-        // if (this.Saturation === this.accessory.context.Saturation) {
-        //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No Changes, Set Saturation: ${value}`);
-        // } else if (this.On) {
-        //   this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set Saturation: ${value}`);
-        // } else {
-        //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Set Saturation: ${value}`);
-        // }
-        // this.lightBulbService.updateCharacteristic(this.platform.Characteristic.ColorTemperature, 140);
-        // this.Saturation = value;
-        // //this.doColorBulbUpdate.next();
         this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Saturation - value: ${value}`);
+        this.hueAndSaturationDebounceHandler({ saturation: value });
+    }
+    async hueAndSaturationSetDebounceWrapper(value) {
+        const data = {
+            hue: 0,
+            saturation: 0,
+        };
+        if (value.hue) {
+            data.hue = value.hue;
+        }
+        if (value.saturation) {
+            data.saturation = value.saturation;
+        }
+        this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue and Saturation - value: ${JSON.stringify(data)}`);
+        this.Hue = data.saturation;
+        this.Saturation = data.saturation;
+        await this.pushHueSaturationChanges();
     }
     async updateHomeKitCharacteristics() {
         if (this.On === undefined) {
