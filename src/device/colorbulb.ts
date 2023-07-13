@@ -217,7 +217,7 @@ export class ColorBulb {
       //   }`,
       // );
       if (Date.now() - this.lastUpdateCharacteristic >= 15000) {
-        await this.updateHomeKitCharacteristics();
+        //await this.updateHomeKitCharacteristics();
       }
     }, 5 * 1000);
   }
@@ -527,13 +527,13 @@ export class ColorBulb {
 
   async BrightnessSet(value: CharacteristicValue): Promise<void> {
     this.infoLog(`BrightnessSet - value: ${value}`);
-    await this.brightnessDebounceHandler(value);
+    this.brightnessDebounceHandler(value);
   }
 
   async brightnessSetDebounceWrapper(value) {
-    //this.updateHomeKitCharacteristics();
     this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} - API CALL: ${value}`);
-    this.pushBrightnessChanges(value);
+    await this.pushBrightnessChanges(value);
+    //this.updateHomeKitCharacteristics();
   }
 
   /**
