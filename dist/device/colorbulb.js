@@ -143,10 +143,13 @@ class ColorBulb {
         }
         await this.updateHomeKitCharacteristics();
         setInterval(async () => {
-            this.infoLog(`updateHomeKitCharacteristics time elapsed: ${(Date.now() - this.lastUpdateCharacteristic) / 1000}s`);
-            this.infoLog(`updateHomeKitCharacteristics condition (${Date.now()} - ${this.lastUpdateCharacteristic}): ${Date.now() - this.lastUpdateCharacteristic >= 15000}`);
+            // this.infoLog(`updateHomeKitCharacteristics time elapsed: ${(Date.now() - this.lastUpdateCharacteristic) / 1000}s`);
+            // this.infoLog(
+            //   `updateHomeKitCharacteristics condition (${Date.now()} - ${this.lastUpdateCharacteristic}): ${
+            //     Date.now() - this.lastUpdateCharacteristic >= 15000
+            //   }`,
+            // );
             if (Date.now() - this.lastUpdateCharacteristic >= 15000) {
-                this.infoLog("updateHomeKitCharacteristics if condition");
                 await this.updateHomeKitCharacteristics();
             }
         }, 5 * 1000);
