@@ -26,7 +26,7 @@ class ColorBulb {
         this.platform = platform;
         this.accessory = accessory;
         this.device = device;
-        this.lastApiUpdate = Date.now();
+        this.lastApiUpdate = Date.now() - 45 * 1000; //so we dont have to wait 30s for the first refresh
         // Connection
         this.BLE = this.device.connectionType === "BLE" || this.device.connectionType === "BLE/OpenAPI";
         this.OpenAPI = this.device.connectionType === "OpenAPI" || this.device.connectionType === "BLE/OpenAPI";
@@ -86,6 +86,7 @@ class ColorBulb {
             .onGet(async () => {
             this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Get Bulb Status: ${this.On}`);
             await this.openAPIRefreshStatus();
+            await this.updateHomeKitCharacteristics();
             return this.On;
         })
             .onSet(this.OnSet.bind(this));
@@ -149,7 +150,6 @@ class ColorBulb {
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} adaptiveLighting: ${this.accessory.context.adaptiveLighting},` +
                 ` adaptiveLightingShift: ${this.adaptiveLightingShift}`);
         }
-        await this.updateHomeKitCharacteristics();
     }
     /**
      * Parse the device status from the SwitchBot api
@@ -310,7 +310,6 @@ class ColorBulb {
             //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
             this.statusCode(statusCode);
             this.On = value;
-            //await this.updateHomeKitCharacteristics();
             //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
         }
         catch (e) {
@@ -427,7 +426,6 @@ class ColorBulb {
     async brightnessSetDebounceWrapper(value) {
         this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} - API CALL: ${value}`);
         await this.pushBrightnessChanges(value);
-        //this.updateHomeKitCharacteristics();
     }
     /**
      * Handle requests to set the value of the "ColorTemperature" characteristic

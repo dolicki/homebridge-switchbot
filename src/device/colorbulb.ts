@@ -82,7 +82,7 @@ export class ColorBulb {
   colorBulbUpdateInProgress!: boolean;
   doColorBulbUpdate!: Subject<void>;
 
-  lastApiUpdate: number = Date.now();
+  lastApiUpdate: number = Date.now() - 45 * 1000; //so we dont have to wait 30s for the first refresh
 
   // Connection
   private readonly BLE = this.device.connectionType === "BLE" || this.device.connectionType === "BLE/OpenAPI";
@@ -148,6 +148,7 @@ export class ColorBulb {
       .onGet(async () => {
         this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Get Bulb Status: ${this.On}`);
         await this.openAPIRefreshStatus();
+        await this.updateHomeKitCharacteristics();
         return this.On;
       })
       .onSet(this.OnSet.bind(this));
@@ -215,8 +216,6 @@ export class ColorBulb {
           ` adaptiveLightingShift: ${this.adaptiveLightingShift}`,
       );
     }
-
-    await this.updateHomeKitCharacteristics();
   }
 
   /**
@@ -400,7 +399,6 @@ export class ColorBulb {
       //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
       this.statusCode(statusCode);
       this.On = value;
-      //await this.updateHomeKitCharacteristics();
       //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
     } catch (e: any) {
       this.apiError(e);
@@ -534,7 +532,6 @@ export class ColorBulb {
   async brightnessSetDebounceWrapper(value) {
     this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} - API CALL: ${value}`);
     await this.pushBrightnessChanges(value);
-    //this.updateHomeKitCharacteristics();
   }
 
   /**
