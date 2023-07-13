@@ -109,17 +109,17 @@ class ColorBulb {
         })
             .onSet(this.BrightnessSet.bind(this));
         // handle ColorTemperature events using the ColorTemperature characteristic
-        // this.lightBulbService
-        //   .getCharacteristic(this.platform.Characteristic.ColorTemperature)
-        //   .setProps({
-        //     minValue: 140,
-        //     maxValue: 500,
-        //     validValueRanges: [140, 500],
-        //   })
-        //   .onGet(() => {
-        //     return this.ColorTemperature!;
-        //   })
-        //   .onSet(this.ColorTemperatureSet.bind(this));
+        this.lightBulbService
+            .getCharacteristic(this.platform.Characteristic.ColorTemperature)
+            .setProps({
+            minValue: 140,
+            maxValue: 500,
+            validValueRanges: [140, 500],
+        })
+            .onGet(() => {
+            return this.ColorTemperature;
+        })
+            .onSet(this.ColorTemperatureSet.bind(this));
         // handle Hue events using the Hue characteristic
         this.lightBulbService
             .getCharacteristic(this.platform.Characteristic.Hue)
@@ -485,7 +485,7 @@ class ColorBulb {
         this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue and Saturation - value: ${this.Hue}, ${this.Saturation}`);
         // this.Hue = data.saturation;
         // this.Saturation = data.saturation;
-        await this.updateHomeKitCharacteristics();
+        await this.updateHueAndSaturationCharacteristics();
         await this.pushHueSaturationChanges();
     }
     async updateHomeKitCharacteristics() {
@@ -512,6 +512,8 @@ class ColorBulb {
         //   this.lightBulbService.updateCharacteristic(this.platform.Characteristic.ColorTemperature, this.ColorTemperature);
         //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic ColorTemperature: ${this.ColorTemperature}`);
         // }
+    }
+    updateHueAndSaturationCharacteristics() {
         if (this.Hue === undefined) {
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Hue: ${this.Hue}`);
         }

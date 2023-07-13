@@ -104,6 +104,7 @@ export declare class ColorBulb {
     SaturationSet(value: CharacteristicValue): Promise<void>;
     hueAndSaturationSetDebounceWrapper(): Promise<void>;
     updateHomeKitCharacteristics(): Promise<void>;
+    private updateHueAndSaturationCharacteristics;
     adaptiveLighting(device: device & devicesConfig): Promise<void>;
     retry({ max, fn }: {
         max: number;
