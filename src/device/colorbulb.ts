@@ -143,7 +143,13 @@ export class ColorBulb {
     }
 
     // handle on / off events using the On characteristic
-    this.lightBulbService.getCharacteristic(this.platform.Characteristic.On).onSet(this.OnSet.bind(this));
+    this.lightBulbService
+      .getCharacteristic(this.platform.Characteristic.On)
+      .onGet(() => {
+        this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Get Bulb Status: ${this.On}`);
+        return this.On;
+      })
+      .onSet(this.OnSet.bind(this));
 
     // handle Brightness events using the Brightness characteristic
     this.lightBulbService
@@ -155,6 +161,7 @@ export class ColorBulb {
         validValueRanges: [0, 100],
       })
       .onGet(() => {
+        this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Get Brightness Status: ${this.Brightness}`);
         return this.Brightness;
       })
       .onSet(this.BrightnessSet.bind(this));
@@ -209,17 +216,6 @@ export class ColorBulb {
     }
 
     await this.updateHomeKitCharacteristics();
-    setInterval(async () => {
-      // this.infoLog(`updateHomeKitCharacteristics time elapsed: ${(Date.now() - this.lastUpdateCharacteristic) / 1000}s`);
-      // this.infoLog(
-      //   `updateHomeKitCharacteristics condition (${Date.now()} - ${this.lastUpdateCharacteristic}): ${
-      //     Date.now() - this.lastUpdateCharacteristic >= 15000
-      //   }`,
-      // );
-      if (Date.now() - this.lastUpdateCharacteristic >= 15000) {
-        //await this.updateHomeKitCharacteristics();
-      }
-    }, 5 * 1000);
   }
 
   /**
