@@ -82,6 +82,8 @@ export class ColorBulb {
   colorBulbUpdateInProgress!: boolean;
   doColorBulbUpdate!: Subject<void>;
 
+  lastUpdateCharacteristic: number = Date.now();
+
   // Connection
   private readonly BLE = this.device.connectionType === "BLE" || this.device.connectionType === "BLE/OpenAPI";
   private readonly OpenAPI = this.device.connectionType === "OpenAPI" || this.device.connectionType === "BLE/OpenAPI";
@@ -129,11 +131,6 @@ export class ColorBulb {
     setInterval(() => {
       this.openAPIRefreshStatus();
     }, 2 * 60 * 1000);
-
-    await this.updateHomeKitCharacteristics();
-    setInterval(() => {
-      this.updateHomeKitCharacteristics();
-    }, 15 * 1000);
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -210,6 +207,14 @@ export class ColorBulb {
           ` adaptiveLightingShift: ${this.adaptiveLightingShift}`,
       );
     }
+
+    await this.updateHomeKitCharacteristics();
+    setInterval(() => {
+      this.infoLog(`updateHomeKitCharacteristics time elapsed: ${(Date.now() - this.lastUpdateCharacteristic) * 1000}s`);
+      if (Date.now() - this.lastUpdateCharacteristic >= 15 * 1000) {
+        this.updateHomeKitCharacteristics.bind(this);
+      }
+    }, 5 * 1000);
   }
 
   /**
@@ -594,6 +599,7 @@ export class ColorBulb {
   }
 
   async updateHomeKitCharacteristics(): Promise<void> {
+    this.lastUpdateCharacteristic = Date.now();
     if (this.On === undefined) {
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
     } else {

@@ -26,6 +26,7 @@ class ColorBulb {
         this.platform = platform;
         this.accessory = accessory;
         this.device = device;
+        this.lastUpdateCharacteristic = Date.now();
         // Connection
         this.BLE = this.device.connectionType === "BLE" || this.device.connectionType === "BLE/OpenAPI";
         this.OpenAPI = this.device.connectionType === "OpenAPI" || this.device.connectionType === "BLE/OpenAPI";
@@ -70,10 +71,6 @@ class ColorBulb {
         setInterval(() => {
             this.openAPIRefreshStatus();
         }, 2 * 60 * 1000);
-        await this.updateHomeKitCharacteristics();
-        setInterval(() => {
-            this.updateHomeKitCharacteristics();
-        }, 15 * 1000);
         // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
         // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
         // accessory.getService('NAME') ?? accessory.addService(this.platform.Service.Outlet, 'NAME', 'USER_DEFINED_SUBTYPE');
@@ -144,6 +141,13 @@ class ColorBulb {
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} adaptiveLighting: ${this.accessory.context.adaptiveLighting},` +
                 ` adaptiveLightingShift: ${this.adaptiveLightingShift}`);
         }
+        await this.updateHomeKitCharacteristics();
+        setInterval(() => {
+            this.infoLog(`updateHomeKitCharacteristics time elapsed: ${(Date.now() - this.lastUpdateCharacteristic) * 1000}s`);
+            if (Date.now() - this.lastUpdateCharacteristic >= 15 * 1000) {
+                this.updateHomeKitCharacteristics.bind(this);
+            }
+        }, 5 * 1000);
     }
     /**
      * Parse the device status from the SwitchBot api
@@ -481,6 +485,7 @@ class ColorBulb {
         //this.doColorBulbUpdate.next();
     }
     async updateHomeKitCharacteristics() {
+        this.lastUpdateCharacteristic = Date.now();
         if (this.On === undefined) {
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
         }
