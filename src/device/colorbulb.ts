@@ -169,17 +169,18 @@ export class ColorBulb {
       .onSet(this.BrightnessSet.bind(this));
 
     // handle ColorTemperature events using the ColorTemperature characteristic
-    // this.lightBulbService
-    //   .getCharacteristic(this.platform.Characteristic.ColorTemperature)
-    //   .setProps({
-    //     minValue: 140,
-    //     maxValue: 500,
-    //     validValueRanges: [140, 500],
-    //   })
-    //   .onGet(() => {
-    //     return this.ColorTemperature!;
-    //   })
-    //   .onSet(this.ColorTemperatureSet.bind(this));
+    this.lightBulbService
+      .getCharacteristic(this.platform.Characteristic.ColorTemperature)
+      .setProps({
+        minValue: 140,
+        maxValue: 500,
+        validValueRanges: [140, 500],
+      })
+      .onGet(() => {
+        return this.ColorTemperature!;
+      })
+      .onSet(this.ColorTemperatureSet.bind(this));
+
     // handle Hue events using the Hue characteristic
     this.lightBulbService
       .getCharacteristic(this.platform.Characteristic.Hue)
