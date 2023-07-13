@@ -32,7 +32,6 @@ class ColorBulb {
         /**
          * Handle requests to set the value of the "Brightness" characteristic
          */
-        this.brightnessDebounce = 0;
         this.brightnessDebounceHandler = debounce(this.brightnessSetDebounceWrapper.bind(this), 350);
         // default placeholders
         this.init(device, accessory, platform);
@@ -207,7 +206,6 @@ class ColorBulb {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
         // Brightness
         this.Brightness = Number(this.brightness);
-        this.brightnessDebounce = this.Brightness;
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Brightness: ${this.Brightness}`);
         // Color, Hue & Brightness
         // if (this.color) {
@@ -298,6 +296,7 @@ class ColorBulb {
             const deviceStatus = await body.json();
             //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
             this.statusCode(statusCode);
+            this.On = value;
             //this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
         }
         catch (e) {
@@ -406,16 +405,14 @@ class ColorBulb {
     async OnSet(value) {
         this.infoLog(`OnSet - value: ${value}`);
         await this.pushOnOffCommand(value);
-        this.On = value;
         await this.updateHomeKitCharacteristics();
     }
     async BrightnessSet(value) {
         this.infoLog(`BrightnessSet - value: ${value}`);
-        this.brightnessDebounce = value;
         await this.brightnessDebounceHandler(value);
     }
     async brightnessSetDebounceWrapper(value) {
-        this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} - API CALL: ${value}`);
+        this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} - API CALL: ${value}`);
         await this.pushBrightnessChanges(value);
         await this.updateHomeKitCharacteristics();
     }
@@ -494,8 +491,8 @@ class ColorBulb {
         }
         else {
             this.accessory.context.Brightness = this.Brightness;
-            this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Brightness, this.brightnessDebounce);
-            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Brightness: ${this.brightnessDebounce}`);
+            this.lightBulbService.updateCharacteristic(this.platform.Characteristic.Brightness, this.Brightness);
+            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic Brightness: ${this.Brightness}`);
         }
         // if (this.ColorTemperature === undefined) {
         //   this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} ColorTemperature: ${this.ColorTemperature}`);
