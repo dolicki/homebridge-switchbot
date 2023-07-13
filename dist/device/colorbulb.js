@@ -70,6 +70,10 @@ class ColorBulb {
         setInterval(() => {
             this.openAPIRefreshStatus();
         }, 2 * 60 * 1000);
+        await this.updateHomeKitCharacteristics();
+        setInterval(() => {
+            this.openAPIRefreshStatus();
+        }, 15 * 1000);
         // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
         // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
         // accessory.getService('NAME') ?? accessory.addService(this.platform.Service.Outlet, 'NAME', 'USER_DEFINED_SUBTYPE');
@@ -250,7 +254,6 @@ class ColorBulb {
             this.brightness = deviceStatus.body.brightness;
             this.colorTemperature = deviceStatus.body.colorTemperature;
             await this.openAPIparseStatus();
-            await this.updateHomeKitCharacteristics();
         }
         catch (e) {
             this.apiError(e);
