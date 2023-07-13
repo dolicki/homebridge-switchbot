@@ -210,9 +210,10 @@ export class ColorBulb {
 
     await this.updateHomeKitCharacteristics();
     setInterval(() => {
-      this.infoLog(`updateHomeKitCharacteristics time elapsed: ${(Date.now() - this.lastUpdateCharacteristic) * 1000}s`);
+      this.infoLog(`updateHomeKitCharacteristics time elapsed: ${(Date.now() - this.lastUpdateCharacteristic) / 1000}s`);
       if (Date.now() - this.lastUpdateCharacteristic >= 15 * 1000) {
-        this.updateHomeKitCharacteristics.bind(this);
+        this.infoLog("updateHomeKitCharacteristics if condition");
+        this.updateHomeKitCharacteristics();
       }
     }, 5 * 1000);
   }
