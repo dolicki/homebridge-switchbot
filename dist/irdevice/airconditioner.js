@@ -13,6 +13,7 @@ class AirConditioner {
         this.platform = platform;
         this.accessory = accessory;
         this.device = device;
+        this.CurrentTemperature = 24;
         this.Timeout = null;
         this.valid12 = [1, 2];
         this.valid012 = [0, 1, 2];
@@ -242,7 +243,7 @@ class AirConditioner {
             this.CurrentTemperature = this.accessory.context.CurrentTemperature;
         }
         this.debugLog(`${this.device.remoteType}: ${this.accessory.displayName} Get CurrentTemperature: ${this.CurrentTemperature}`);
-        return this.CurrentTemperature;
+        return this.CurrentTemperature || 24;
     }
     async RotationSpeedGet() {
         if (!this.CurrentFanSpeed) {

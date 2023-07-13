@@ -15,7 +15,7 @@ export class AirConditioner {
   // Characteristic Values
   Active!: CharacteristicValue;
   RotationSpeed!: CharacteristicValue;
-  CurrentTemperature!: CharacteristicValue;
+  CurrentTemperature: CharacteristicValue = 24;
   TargetHeaterCoolerState!: CharacteristicValue;
   CurrentHeaterCoolerState!: CharacteristicValue;
   HeatingThresholdTemperature!: CharacteristicValue;
@@ -302,7 +302,7 @@ export class AirConditioner {
       this.CurrentTemperature = this.accessory.context.CurrentTemperature;
     }
     this.debugLog(`${this.device.remoteType}: ${this.accessory.displayName} Get CurrentTemperature: ${this.CurrentTemperature}`);
-    return this.CurrentTemperature;
+    return this.CurrentTemperature || 24;
   }
 
   async RotationSpeedGet(): Promise<number> {
