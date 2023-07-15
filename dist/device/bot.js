@@ -278,12 +278,13 @@ class Bot {
                 this.outletService.addCharacteristic(this.platform.Characteristic.ConfiguredName, accessory.displayName);
             }
             this.outletService.getCharacteristic(this.platform.Characteristic.On).onSet(this.OnSet.bind(this));
-            this.outletService.getCharacteristic(this.platform.Characteristic.On).onGet(() => {
+            this.outletService.getCharacteristic(this.platform.Characteristic.On).onGet(async () => {
                 //this.infoLog(`${this.device.deviceType}: ${accessory.displayName} onGet Characteristic: ${this.On}`);
-                this.infoLog(`Goran - ${this.device.deviceType}: ${accessory.displayName} onGet Characteristic: ${this.On}`);
-                if (this.device.deviceType == "pc") {
+                this.infoLog(`Goran - his.device.bot?.deviceType = ${this.device.bot?.deviceType}: ${accessory.displayName} onGet Characteristic: ${this.On}`);
+                if (this.device.bot?.deviceType == "pc") {
+                    this.infoLog(`Goran - ${this.device.deviceType}: ${accessory.displayName} onGet Characteristic - call API: ${this.On}`);
                     try {
-                        (0, undici_1.request)("http://192.168.178.50:62333/status", {
+                        await (0, undici_1.request)("http://192.168.178.50:62333/status", {
                             method: "GET",
                             headersTimeout: 1000,
                         });
