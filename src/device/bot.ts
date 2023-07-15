@@ -976,8 +976,10 @@ export class Bot {
       }
     } else {
       if (this.On === undefined) {
-        this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
+        this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On (undefined): ${this.On}`);
       } else {
+        this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Goran - ${this.On}`);
+        this.On = false;
         this.outletService?.updateCharacteristic(this.platform.Characteristic.On, false);
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic On: ${this.On}`);
       }
