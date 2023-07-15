@@ -745,8 +745,9 @@ class Bot {
                 const url = "http://192.168.178.50:62333" + "/turnOff";
                 try {
                     const request = await axios_1.default.get(url, {
-                        timeout: 550,
+                        timeout: 1000,
                     });
+                    this.On = false;
                 }
                 catch (e) {
                     this.errorLog("Send TurnOff Command error:" + e);
