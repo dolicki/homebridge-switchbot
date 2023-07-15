@@ -343,7 +343,18 @@ export class Bot {
         //this.infoLog(`${this.device.deviceType}: ${accessory.displayName} onGet Characteristic: ${this.On}`);
         this.infoLog(`Goran - ${this.device.deviceType}: ${accessory.displayName} onGet Characteristic: ${this.On}`);
         if (this.device.deviceType == "pc") {
-          return this.On;
+          try {
+            request("http://192.168.178.50:62333/status", {
+              method: "GET",
+              headersTimeout: 1000,
+            });
+            this.On = true;
+            return true;
+          } catch (e) {
+            this.errorLog(e);
+            this.On = false;
+            return false;
+          }
         }
         return false;
       });
@@ -792,10 +803,13 @@ export class Bot {
       this.On = value;
       if (value == true) {
         this.infoLog(`call api - value: ${value}`);
+        await this.openAPIpushChanges();
       } else {
         this.infoLog(`call pc command: ${value}`);
+        request("http://192.168.178.50:62333/turnOff", {
+          method: "GET",
+        });
       }
-
       setTimeout(() => {
         this.updateHomeKitCharacteristics();
       }, 1000);
@@ -813,7 +827,7 @@ export class Bot {
         this.updateHomeKitCharacteristics();
       }, 1000);
     }
-    //this.doBotUpdate.next();
+    this.doBotUpdate.next();
   }
 
   /**
