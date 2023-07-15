@@ -794,7 +794,7 @@ export class Bot {
       this.On = value;
       setTimeout(() => {
         this.updateHomeKitCharacteristics();
-      }, 3000);
+      }, 1000);
     }
     //this.doBotUpdate.next();
   }
