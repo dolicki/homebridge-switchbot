@@ -717,7 +717,7 @@ class Bot {
                     this.debugLog(`${this.device.deviceType} set to Multi-Press. Multi-Press count: ${this.multiPressCount}`);
                 }
             }
-            this.On = false;
+            this.On = value;
             await this.updateHomeKitCharacteristics();
         }
         //this.doBotUpdate.next();
@@ -889,7 +889,7 @@ class Bot {
                 this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
             }
             else {
-                this.outletService?.updateCharacteristic(this.platform.Characteristic.On, this.On);
+                this.outletService?.updateCharacteristic(this.platform.Characteristic.On, false);
                 this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic On: ${this.On}`);
             }
         }
