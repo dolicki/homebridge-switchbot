@@ -720,7 +720,7 @@ class Bot {
             this.On = false;
             await this.updateHomeKitCharacteristics();
         }
-        this.doBotUpdate.next();
+        //this.doBotUpdate.next();
     }
     /**
      * Updates the status for each of the HomeKit Characteristics

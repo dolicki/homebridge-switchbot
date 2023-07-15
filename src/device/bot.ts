@@ -790,7 +790,7 @@ export class Bot {
       this.On = false;
       await this.updateHomeKitCharacteristics();
     }
-    this.doBotUpdate.next();
+    //this.doBotUpdate.next();
   }
 
   /**
