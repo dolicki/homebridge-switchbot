@@ -726,7 +726,7 @@ class Bot {
                 this.updateHomeKitCharacteristics();
             }, 1000);
         }
-        //this.doBotUpdate.next();
+        this.doBotUpdate.next();
     }
     /**
      * Updates the status for each of the HomeKit Characteristics

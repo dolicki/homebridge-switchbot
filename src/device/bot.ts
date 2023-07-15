@@ -796,7 +796,7 @@ export class Bot {
         this.updateHomeKitCharacteristics();
       }, 1000);
     }
-    //this.doBotUpdate.next();
+    this.doBotUpdate.next();
   }
 
   /**
