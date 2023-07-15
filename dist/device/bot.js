@@ -278,6 +278,9 @@ class Bot {
                 this.outletService.addCharacteristic(this.platform.Characteristic.ConfiguredName, accessory.displayName);
             }
             this.outletService.getCharacteristic(this.platform.Characteristic.On).onSet(this.OnSet.bind(this));
+            this.outletService.getCharacteristic(this.platform.Characteristic.On).onGet(() => {
+                return false;
+            });
         }
         // Battery Service
         if (!this.BLE) {
@@ -889,8 +892,8 @@ class Bot {
                 this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On (undefined): ${this.On}`);
             }
             else {
-                this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Goran - ${this.On}`);
                 this.On = false;
+                this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Goran - ${this.On}`);
                 this.outletService?.updateCharacteristic(this.platform.Characteristic.On, false);
                 this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic On: ${this.On}`);
             }
