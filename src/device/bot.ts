@@ -1,11 +1,11 @@
-import { Context } from 'vm';
-import { request } from 'undici';
-import { sleep } from '../utils';
-import { interval, Subject } from 'rxjs';
-import { SwitchBotPlatform } from '../platform';
-import { debounceTime, skipWhile, take, tap } from 'rxjs/operators';
-import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
-import { device, devicesConfig, deviceStatus, ad, serviceData, switchbot, Devices } from '../settings';
+import { Context } from "vm";
+import { request } from "undici";
+import { sleep } from "../utils";
+import { interval, Subject } from "rxjs";
+import { SwitchBotPlatform } from "../platform";
+import { debounceTime, skipWhile, take, tap } from "rxjs/operators";
+import { Service, PlatformAccessory, CharacteristicValue } from "homebridge";
+import { device, devicesConfig, deviceStatus, ad, serviceData, switchbot, Devices } from "../settings";
 
 /**
  * Platform Accessory
@@ -32,17 +32,17 @@ export class Bot {
   StatusLowBattery!: CharacteristicValue;
 
   // OpenAPI Others
-  power: deviceStatus['power'];
+  power: deviceStatus["power"];
   deviceStatus!: any; //deviceStatusResponse;
 
   // BLE Others
   connected?: boolean;
   switchbot!: switchbot;
   serviceData!: serviceData;
-  address!: ad['address'];
-  mode!: serviceData['mode'];
-  state!: serviceData['state'];
-  battery!: serviceData['battery'];
+  address!: ad["address"];
+  mode!: serviceData["mode"];
+  state!: serviceData["state"];
+  battery!: serviceData["battery"];
 
   // Config
   botMode!: string;
@@ -60,8 +60,8 @@ export class Bot {
   doBotUpdate!: Subject<void>;
 
   // Connection
-  private readonly BLE = (this.device.connectionType === 'BLE' || this.device.connectionType === 'BLE/OpenAPI');
-  private readonly OpenAPI = (this.device.connectionType === 'OpenAPI' || this.device.connectionType === 'BLE/OpenAPI');
+  private readonly BLE = this.device.connectionType === "BLE" || this.device.connectionType === "BLE/OpenAPI";
+  private readonly OpenAPI = this.device.connectionType === "OpenAPI" || this.device.connectionType === "BLE/OpenAPI";
 
   constructor(private readonly platform: SwitchBotPlatform, private accessory: PlatformAccessory, public device: device & devicesConfig) {
     // default placeholders
@@ -86,8 +86,8 @@ export class Bot {
     // set accessory information
     accessory
       .getService(this.platform.Service.AccessoryInformation)!
-      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'SwitchBot')
-      .setCharacteristic(this.platform.Characteristic.Model, 'SWITCHBOT-BOT-S1')
+      .setCharacteristic(this.platform.Characteristic.Manufacturer, "SwitchBot")
+      .setCharacteristic(this.platform.Characteristic.Model, "SWITCHBOT-BOT-S1")
       .setCharacteristic(this.platform.Characteristic.SerialNumber, device.deviceId!)
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.FirmwareRevision(accessory, device))
       .getCharacteristic(this.platform.Characteristic.FirmwareRevision)
@@ -95,7 +95,7 @@ export class Bot {
 
     // get the service if it exists, otherwise create a new service
     // you can create multiple services for each accessory
-    if (device.bot?.deviceType === 'switch') {
+    if (device.bot?.deviceType === "switch") {
       this.removeFanService(accessory);
       this.removeLockService(accessory);
       this.removeDoorService(accessory);
@@ -108,16 +108,15 @@ export class Bot {
 
       // Add switchService
       (this.switchService = accessory.getService(this.platform.Service.Switch) || accessory.addService(this.platform.Service.Switch)),
-      `${accessory.displayName} Switch`;
+        `${accessory.displayName} Switch`;
       this.infoLog(`${this.device.deviceType}: ${accessory.displayName} Displaying as Switch`);
-
 
       this.switchService.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
       if (!this.switchService.testCharacteristic(this.platform.Characteristic.ConfiguredName)) {
         this.switchService.addCharacteristic(this.platform.Characteristic.ConfiguredName, accessory.displayName);
       }
       this.switchService.getCharacteristic(this.platform.Characteristic.On).onSet(this.OnSet.bind(this));
-    } else if (device.bot?.deviceType === 'garagedoor') {
+    } else if (device.bot?.deviceType === "garagedoor") {
       this.removeFanService(accessory);
       this.removeLockService(accessory);
       this.removeDoorService(accessory);
@@ -131,7 +130,7 @@ export class Bot {
       // Add switchService
       (this.garageDoorService =
         accessory.getService(this.platform.Service.GarageDoorOpener) || accessory.addService(this.platform.Service.GarageDoorOpener)),
-      `${accessory.displayName} Garage Door Opener`;
+        `${accessory.displayName} Garage Door Opener`;
       this.infoLog(`${this.device.deviceType}: ${accessory.displayName} Displaying as Garage Door Opener`);
 
       this.garageDoorService.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
@@ -140,7 +139,7 @@ export class Bot {
       }
       this.garageDoorService.getCharacteristic(this.platform.Characteristic.TargetDoorState).onSet(this.OnSet.bind(this));
       this.garageDoorService.setCharacteristic(this.platform.Characteristic.ObstructionDetected, false);
-    } else if (device.bot?.deviceType === 'door') {
+    } else if (device.bot?.deviceType === "door") {
       this.removeFanService(accessory);
       this.removeLockService(accessory);
       this.removeOutletService(accessory);
@@ -153,7 +152,7 @@ export class Bot {
 
       // Add switchService
       (this.doorService = accessory.getService(this.platform.Service.Door) || accessory.addService(this.platform.Service.Door)),
-      `${accessory.displayName} Door`;
+        `${accessory.displayName} Door`;
       this.infoLog(`${this.device.deviceType}: ${accessory.displayName} Displaying as Door`);
 
       this.doorService.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
@@ -170,7 +169,7 @@ export class Bot {
         })
         .onSet(this.OnSet.bind(this));
       this.doorService.setCharacteristic(this.platform.Characteristic.PositionState, this.platform.Characteristic.PositionState.STOPPED);
-    } else if (device.bot?.deviceType === 'window') {
+    } else if (device.bot?.deviceType === "window") {
       this.removeFanService(accessory);
       this.removeLockService(accessory);
       this.removeDoorService(accessory);
@@ -183,7 +182,7 @@ export class Bot {
 
       // Add switchService
       (this.windowService = accessory.getService(this.platform.Service.Window) || accessory.addService(this.platform.Service.Window)),
-      `${accessory.displayName} Window`;
+        `${accessory.displayName} Window`;
       this.infoLog(`${this.device.deviceType}: ${accessory.displayName} Displaying as Window`);
 
       this.windowService.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
@@ -200,7 +199,7 @@ export class Bot {
         })
         .onSet(this.OnSet.bind(this));
       this.windowService.setCharacteristic(this.platform.Characteristic.PositionState, this.platform.Characteristic.PositionState.STOPPED);
-    } else if (device.bot?.deviceType === 'windowcovering') {
+    } else if (device.bot?.deviceType === "windowcovering") {
       this.removeFanService(accessory);
       this.removeLockService(accessory);
       this.removeDoorService(accessory);
@@ -214,7 +213,7 @@ export class Bot {
       // Add switchService
       (this.windowCoveringService =
         accessory.getService(this.platform.Service.WindowCovering) || accessory.addService(this.platform.Service.WindowCovering)),
-      `${accessory.displayName} Window Covering`;
+        `${accessory.displayName} Window Covering`;
       this.infoLog(`${this.device.deviceType}: ${accessory.displayName} Displaying as Window Covering`);
 
       this.windowCoveringService.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
@@ -231,7 +230,7 @@ export class Bot {
         })
         .onSet(this.OnSet.bind(this));
       this.windowCoveringService.setCharacteristic(this.platform.Characteristic.PositionState, this.platform.Characteristic.PositionState.STOPPED);
-    } else if (device.bot?.deviceType === 'lock') {
+    } else if (device.bot?.deviceType === "lock") {
       this.removeFanService(accessory);
       this.removeDoorService(accessory);
       this.removeOutletService(accessory);
@@ -244,7 +243,7 @@ export class Bot {
 
       // Add switchService
       (this.lockService = accessory.getService(this.platform.Service.LockMechanism) || accessory.addService(this.platform.Service.LockMechanism)),
-      `${accessory.displayName} Lock`;
+        `${accessory.displayName} Lock`;
       this.infoLog(`${this.device.deviceType}: ${accessory.displayName} Displaying as Lock`);
 
       this.lockService.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
@@ -252,7 +251,7 @@ export class Bot {
         this.lockService.addCharacteristic(this.platform.Characteristic.ConfiguredName, accessory.displayName);
       }
       this.lockService.getCharacteristic(this.platform.Characteristic.LockTargetState).onSet(this.OnSet.bind(this));
-    } else if (device.bot?.deviceType === 'faucet') {
+    } else if (device.bot?.deviceType === "faucet") {
       this.removeFanService(accessory);
       this.removeLockService(accessory);
       this.removeDoorService(accessory);
@@ -265,7 +264,7 @@ export class Bot {
 
       // Add switchService
       (this.faucetService = accessory.getService(this.platform.Service.Faucet) || accessory.addService(this.platform.Service.Faucet)),
-      `${accessory.displayName} Faucet`;
+        `${accessory.displayName} Faucet`;
       this.infoLog(`${this.device.deviceType}: ${accessory.displayName} Displaying as Faucet`);
 
       this.faucetService.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
@@ -273,7 +272,7 @@ export class Bot {
         this.faucetService.addCharacteristic(this.platform.Characteristic.ConfiguredName, accessory.displayName);
       }
       this.faucetService.getCharacteristic(this.platform.Characteristic.Active).onSet(this.OnSet.bind(this));
-    } else if (device.bot?.deviceType === 'fan') {
+    } else if (device.bot?.deviceType === "fan") {
       this.removeLockService(accessory);
       this.removeDoorService(accessory);
       this.removeFaucetService(accessory);
@@ -286,7 +285,7 @@ export class Bot {
 
       // Add switchService
       (this.fanService = accessory.getService(this.platform.Service.Fan) || accessory.addService(this.platform.Service.Fan)),
-      `${accessory.displayName} Fan`;
+        `${accessory.displayName} Fan`;
       this.infoLog(`${this.device.deviceType}: ${accessory.displayName} Displaying as Fan`);
 
       this.fanService.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
@@ -294,7 +293,7 @@ export class Bot {
         this.fanService.addCharacteristic(this.platform.Characteristic.ConfiguredName, accessory.displayName);
       }
       this.fanService.getCharacteristic(this.platform.Characteristic.On).onSet(this.OnSet.bind(this));
-    } else if (device.bot?.deviceType === 'stateful') {
+    } else if (device.bot?.deviceType === "stateful") {
       this.removeFanService(accessory);
       this.removeLockService(accessory);
       this.removeDoorService(accessory);
@@ -309,7 +308,7 @@ export class Bot {
       (this.statefulProgrammableSwitchService =
         accessory.getService(this.platform.Service.StatefulProgrammableSwitch) ||
         accessory.addService(this.platform.Service.StatefulProgrammableSwitch)),
-      `${accessory.displayName} Stateful Programmable Switch`;
+        `${accessory.displayName} Stateful Programmable Switch`;
       this.infoLog(`${this.device.deviceType}: ${accessory.displayName} Displaying as Stateful Programmable Switch`);
 
       this.statefulProgrammableSwitchService.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
@@ -332,7 +331,7 @@ export class Bot {
 
       // Add outletService
       (this.outletService = accessory.getService(this.platform.Service.Outlet) || accessory.addService(this.platform.Service.Outlet)),
-      `${accessory.displayName} Outlet`;
+        `${accessory.displayName} Outlet`;
       this.infoLog(`${this.device.deviceType}: ${accessory.displayName} Displaying as Outlet`);
 
       this.outletService.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
@@ -350,7 +349,7 @@ export class Bot {
     } else if (this.BLE && !this.batteryService) {
       this.debugLog(`${this.device.deviceType}: ${accessory.displayName} Add Battery Service`);
       (this.batteryService = this.accessory.getService(this.platform.Service.Battery) || this.accessory.addService(this.platform.Service.Battery)),
-      `${accessory.displayName} Battery`;
+        `${accessory.displayName} Battery`;
 
       this.batteryService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Battery`);
       if (!this.batteryService.testCharacteristic(this.platform.Characteristic.ConfiguredName)) {
@@ -392,8 +391,10 @@ export class Bot {
           }
         } catch (e: any) {
           this.apiError(e);
-          this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed pushChanges with ${this.device.connectionType} Connection,`
-            + ` Error Message: ${JSON.stringify(e.message)}`);
+          this.errorLog(
+            `${this.device.deviceType}: ${this.accessory.displayName} failed pushChanges with ${this.device.connectionType} Connection,` +
+              ` Error Message: ${JSON.stringify(e.message)}`,
+          );
         }
         this.botUpdateInProgress = false;
       });
@@ -411,8 +412,9 @@ export class Bot {
       await this.openAPIparseStatus();
     } else {
       await this.offlineOff();
-      this.debugWarnLog(`${this.device.deviceType}: ${this.accessory.displayName} Connection Type:`
-        + ` ${this.device.connectionType}, parseStatus will not happen.`);
+      this.debugWarnLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} Connection Type:` + ` ${this.device.connectionType}, parseStatus will not happen.`,
+      );
     }
   }
 
@@ -445,7 +447,7 @@ export class Bot {
 
   async openAPIparseStatus(): Promise<void> {
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} openAPIparseStatus`);
-    if (this.botMode === 'press') {
+    if (this.botMode === "press") {
       this.On = false;
       this.accessory.context.On = this.On;
     } else {
@@ -469,8 +471,10 @@ export class Bot {
       await this.openAPIRefreshStatus();
     } else {
       await this.offlineOff();
-      this.debugWarnLog(`${this.device.deviceType}: ${this.accessory.displayName} Connection Type:`
-        + ` ${this.device.connectionType}, refreshStatus will not happen.`);
+      this.debugWarnLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} Connection Type:` +
+          ` ${this.device.connectionType}, refreshStatus will not happen.`,
+      );
     }
   }
 
@@ -480,7 +484,7 @@ export class Bot {
     // Convert to BLE Address
     this.device.bleMac = this.device
       .deviceId!.match(/.{1,2}/g)!
-      .join(':')
+      .join(":")
       .toLowerCase();
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} BLE Address: ${this.device.bleMac}`);
     this.getCustomBLEAddress(switchbot);
@@ -488,22 +492,26 @@ export class Bot {
     if (switchbot !== false) {
       switchbot
         .startScan({
-          model: 'H',
+          model: "H",
           id: this.device.bleMac,
         })
         .then(async () => {
           // Set an event hander
           switchbot.onadvertisement = async (ad: ad) => {
             this.address = ad.address;
-            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Config BLE Address: ${this.device.bleMac},`
-              + ` BLE Address Found: ${this.address}`);
+            this.debugLog(
+              `${this.device.deviceType}: ${this.accessory.displayName} Config BLE Address: ${this.device.bleMac},` +
+                ` BLE Address Found: ${this.address}`,
+            );
             this.serviceData = ad.serviceData;
             this.mode = ad.serviceData.mode;
             this.state = ad.serviceData.state;
             this.battery = ad.serviceData.battery;
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} serviceData: ${JSON.stringify(ad.serviceData)}`);
-            this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName}, model: ${ad.serviceData.model}, modelName: `
-              + `${ad.serviceData.modelName}, mode: ${ad.serviceData.mode}, state: ${ad.serviceData.state}, battery: ${ad.serviceData.battery}`);
+            this.debugLog(
+              `${this.device.deviceType}: ${this.accessory.displayName}, model: ${ad.serviceData.model}, modelName: ` +
+                `${ad.serviceData.modelName}, mode: ${ad.serviceData.mode}, state: ${ad.serviceData.state}, battery: ${ad.serviceData.battery}`,
+            );
 
             if (this.serviceData) {
               this.connected = true;
@@ -523,8 +531,10 @@ export class Bot {
         })
         .catch(async (e: any) => {
           this.apiError(e);
-          this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed BLERefreshStatus with ${this.device.connectionType}`
-            + ` Connection, Error Message: ${JSON.stringify(e.message)}`);
+          this.errorLog(
+            `${this.device.deviceType}: ${this.accessory.displayName} failed BLERefreshStatus with ${this.device.connectionType}` +
+              ` Connection, Error Message: ${JSON.stringify(e.message)}`,
+          );
           await this.BLERefreshConnection(switchbot);
         });
     } else {
@@ -542,17 +552,16 @@ export class Bot {
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
       this.statusCode(statusCode);
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
-      this.debugLog(
-        `${this.device.deviceType}: ${this.accessory.displayName
-        } refreshStatus: ${JSON.stringify(deviceStatus)}`,
-      );
+      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} refreshStatus: ${JSON.stringify(deviceStatus)}`);
       this.power = deviceStatus.body.power;
       this.openAPIparseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
       this.apiError(e);
-      this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed openAPIRefreshStatus with ${this.device.connectionType}`
-        + ` Connection, Error Message: ${JSON.stringify(e.message)}`);
+      this.errorLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} failed openAPIRefreshStatus with ${this.device.connectionType}` +
+          ` Connection, Error Message: ${JSON.stringify(e.message)}`,
+      );
     }
   }
 
@@ -572,8 +581,9 @@ export class Bot {
       await this.openAPIpushChanges();
     } else {
       await this.offlineOff();
-      this.debugWarnLog(`${this.device.deviceType}: ${this.accessory.displayName} Connection Type:`
-        + ` ${this.device.connectionType}, pushChanges will not happen.`);
+      this.debugWarnLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} Connection Type:` + ` ${this.device.connectionType}, pushChanges will not happen.`,
+      );
     }
     // Refresh the status from the API
     interval(15000)
@@ -592,14 +602,14 @@ export class Bot {
       // Convert to BLE Address
       this.device.bleMac = this.device
         .deviceId!.match(/.{1,2}/g)!
-        .join(':')
+        .join(":")
         .toLowerCase();
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} BLE Address: ${this.device.bleMac}`);
       //if (switchbot !== false) {
-      if (this.botMode === 'press') {
+      if (this.botMode === "press") {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Bot Mode: ${this.botMode}`);
         switchbot
-          .discover({ model: 'H', quick: true, id: this.device.bleMac })
+          .discover({ model: "H", quick: true, id: this.device.bleMac })
           .then(async (device_list: { press: (arg0: { id: string | undefined }) => any }[]) => {
             this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
             return await device_list[0].press({ id: this.device.bleMac });
@@ -608,7 +618,7 @@ export class Bot {
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Done.`);
             this.accessory.context.On = this.On;
             setTimeout(() => {
-              if (this.device.bot?.deviceType === 'switch') {
+              if (this.device.bot?.deviceType === "switch") {
                 this.switchService?.getCharacteristic(this.platform.Characteristic.On).updateValue(this.On);
               } else {
                 this.outletService?.getCharacteristic(this.platform.Characteristic.On).updateValue(this.On);
@@ -618,14 +628,16 @@ export class Bot {
           })
           .catch(async (e: any) => {
             this.apiError(e);
-            this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed BLEpushChanges with ${this.device.connectionType}`
-              + ` Connection & botMode: ${this.botMode}, Error Message: ${JSON.stringify(e.message)}`);
+            this.errorLog(
+              `${this.device.deviceType}: ${this.accessory.displayName} failed BLEpushChanges with ${this.device.connectionType}` +
+                ` Connection & botMode: ${this.botMode}, Error Message: ${JSON.stringify(e.message)}`,
+            );
             await this.BLEPushConnection();
           });
-      } else if (this.botMode === 'switch') {
+      } else if (this.botMode === "switch") {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Press Mode: ${this.botMode}`);
         switchbot
-          .discover({ model: 'H', quick: true, id: this.device.bleMac })
+          .discover({ model: "H", quick: true, id: this.device.bleMac })
           .then(async (device_list: any) => {
             this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
             return await this.retry({
@@ -645,16 +657,19 @@ export class Bot {
           })
           .catch(async (e: any) => {
             this.apiError(e);
-            this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed BLEpushChanges with ${this.device.connectionType}`
-              + ` Connection & botMode: ${this.botMode}, Error Message: ${JSON.stringify(e.message)}`);
+            this.errorLog(
+              `${this.device.deviceType}: ${this.accessory.displayName} failed BLEpushChanges with ${this.device.connectionType}` +
+                ` Connection & botMode: ${this.botMode}, Error Message: ${JSON.stringify(e.message)}`,
+            );
             await this.BLEPushConnection();
           });
       } else {
         this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} Bot Mode: ${this.botMode}`);
       }
     } else {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No BLEpushChanges.` + `On: ${this.On}, `
-        + `OnCached: ${this.accessory.context.On}`);
+      this.debugLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} No BLEpushChanges.` + `On: ${this.On}, ` + `OnCached: ${this.accessory.context.On}`,
+      );
     }
   }
 
@@ -664,40 +679,40 @@ export class Bot {
       this.debugLog(`${this.device.deviceType}: ${this.multiPressCount} request(s) queued.`);
       this.On = true;
     }
-    if ((this.On !== this.accessory.context.On || this.allowPush) || this.multiPressCount > 0) {
-      let command = '';
-      if (this.botMode === 'switch' && this.On) {
-        command = 'turnOn';
+    if (this.On !== this.accessory.context.On || this.allowPush || this.multiPressCount > 0) {
+      let command = "";
+      if (this.botMode === "switch" && this.On) {
+        command = "turnOn";
         this.On = true;
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Switch Mode, Turning ${this.On}`);
-      } else if (this.botMode === 'switch' && !this.On) {
-        command = 'turnOff';
+      } else if (this.botMode === "switch" && !this.On) {
+        command = "turnOff";
         this.On = false;
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Switch Mode, Turning ${this.On}`);
-      } else if (this.botMode === 'press' || this.botMode === 'multipress') {
-        command = 'press';
+      } else if (this.botMode === "press" || this.botMode === "multipress") {
+        command = "press";
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Press Mode`);
         this.On = false;
       } else {
         throw new Error(`${this.device.deviceType}: ${this.accessory.displayName} Device Paramters not set for this Bot.`);
       }
       const bodyChange = JSON.stringify({
-        'command': `${command}`,
-        'parameter': 'default',
-        'commandType': 'command',
+        command: `${command}`,
+        parameter: "default",
+        commandType: "command",
       });
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Sending request to SwitchBot API, body: ${bodyChange},`);
       try {
         const { body, statusCode, headers } = await request(`${Devices}/${this.device.deviceId}/commands`, {
           body: bodyChange,
-          method: 'POST',
+          method: "POST",
           headers: this.platform.generateHeaders(),
         });
         const deviceStatus = await body.json();
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Devices: ${JSON.stringify(deviceStatus.body)}`);
         this.statusCode(statusCode);
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Headers: ${JSON.stringify(headers)}`);
-        if (this.device.bot?.mode === 'multipress') {
+        if (this.device.bot?.mode === "multipress") {
           this.multiPressCount--;
           if (this.multiPressCount > 0) {
             this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Multi Press Count: ${this.multiPressCount}`);
@@ -707,13 +722,17 @@ export class Bot {
         }
       } catch (e: any) {
         this.apiError(e);
-        this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} failed openAPIpushChanges with ${this.device.connectionType}`
-          + ` Connection, Error Message: ${JSON.stringify(e.message)}`,
+        this.errorLog(
+          `${this.device.deviceType}: ${this.accessory.displayName} failed openAPIpushChanges with ${this.device.connectionType}` +
+            ` Connection, Error Message: ${JSON.stringify(e.message)}`,
         );
       }
     } else {
-      this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} No openAPIpushChanges.` + `On: ${this.On}, `
-        + `OnCached: ${this.accessory.context.On}`);
+      this.debugLog(
+        `${this.device.deviceType}: ${this.accessory.displayName} No openAPIpushChanges.` +
+          `On: ${this.On}, ` +
+          `OnCached: ${this.accessory.context.On}`,
+      );
     }
   }
 
@@ -721,7 +740,7 @@ export class Bot {
    * Handle requests to set the "On" characteristic
    */
   async OnSet(value: CharacteristicValue): Promise<void> {
-    if (this.device.bot?.deviceType === 'garagedoor') {
+    if (this.device.bot?.deviceType === "garagedoor") {
       this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set TargetDoorState: ${value}`);
       if (value === this.platform.Characteristic.TargetDoorState.CLOSED) {
         this.On = false;
@@ -729,9 +748,9 @@ export class Bot {
         this.On = true;
       }
     } else if (
-      this.device.bot?.deviceType === 'door' ||
-      this.device.bot?.deviceType === 'window' ||
-      this.device.bot?.deviceType === 'windowcovering'
+      this.device.bot?.deviceType === "door" ||
+      this.device.bot?.deviceType === "window" ||
+      this.device.bot?.deviceType === "windowcovering"
     ) {
       this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set TargetPosition: ${value}`);
       if (value === 0) {
@@ -739,21 +758,21 @@ export class Bot {
       } else {
         this.On = true;
       }
-    } else if (this.device.bot?.deviceType === 'lock') {
+    } else if (this.device.bot?.deviceType === "lock") {
       this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set LockTargetState: ${value}`);
       if (value === this.platform.Characteristic.LockTargetState.SECURED) {
         this.On = false;
       } else {
         this.On = true;
       }
-    } else if (this.device.bot?.deviceType === 'faucet') {
+    } else if (this.device.bot?.deviceType === "faucet") {
       this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set Active: ${value}`);
       if (value === this.platform.Characteristic.Active.INACTIVE) {
         this.On = false;
       } else {
         this.On = true;
       }
-    } else if (this.device.bot?.deviceType === 'stateful') {
+    } else if (this.device.bot?.deviceType === "stateful") {
       this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set ProgrammableSwitchOutputState: ${value}`);
       if (value === 0) {
         this.On = false;
@@ -762,14 +781,14 @@ export class Bot {
       }
     } else {
       this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set On: ${value}`);
-      if (this.device.bot?.mode === 'multipress') {
+      if (this.device.bot?.mode === "multipress") {
         if (value === true) {
           this.multiPressCount++;
           this.debugLog(`${this.device.deviceType} set to Multi-Press. Multi-Press count: ${this.multiPressCount}`);
         }
-
       }
-      this.On = value;
+      this.On = false;
+      await this.updateHomeKitCharacteristics();
     }
     this.doBotUpdate.next();
   }
@@ -778,7 +797,7 @@ export class Bot {
    * Updates the status for each of the HomeKit Characteristics
    */
   async updateHomeKitCharacteristics(): Promise<void> {
-    if (this.device.bot?.deviceType === 'garagedoor') {
+    if (this.device.bot?.deviceType === "garagedoor") {
       if (this.On === undefined) {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
       } else {
@@ -791,8 +810,9 @@ export class Bot {
             this.platform.Characteristic.CurrentDoorState,
             this.platform.Characteristic.CurrentDoorState.OPEN,
           );
-          this.debugLog(`${this.device.deviceType}: `
-            + `${this.accessory.displayName} updateCharacteristic TargetDoorState: Open, CurrentDoorState: Open`);
+          this.debugLog(
+            `${this.device.deviceType}: ` + `${this.accessory.displayName} updateCharacteristic TargetDoorState: Open, CurrentDoorState: Open`,
+          );
         } else {
           this.garageDoorService?.updateCharacteristic(
             this.platform.Characteristic.TargetDoorState,
@@ -802,12 +822,13 @@ export class Bot {
             this.platform.Characteristic.CurrentDoorState,
             this.platform.Characteristic.CurrentDoorState.CLOSED,
           );
-          this.debugLog(`${this.device.deviceType}: `
-            + `${this.accessory.displayName} updateCharacteristic TargetDoorState: Open, CurrentDoorState: Open`);
+          this.debugLog(
+            `${this.device.deviceType}: ` + `${this.accessory.displayName} updateCharacteristic TargetDoorState: Open, CurrentDoorState: Open`,
+          );
         }
       }
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Garage Door On: ${this.On}`);
-    } else if (this.device.bot?.deviceType === 'door') {
+    } else if (this.device.bot?.deviceType === "door") {
       if (this.On === undefined) {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
       } else {
@@ -824,7 +845,7 @@ export class Bot {
         }
       }
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Door On: ${this.On}`);
-    } else if (this.device.bot?.deviceType === 'window') {
+    } else if (this.device.bot?.deviceType === "window") {
       if (this.On === undefined) {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
       } else {
@@ -841,7 +862,7 @@ export class Bot {
         }
       }
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Window On: ${this.On}`);
-    } else if (this.device.bot?.deviceType === 'windowcovering') {
+    } else if (this.device.bot?.deviceType === "windowcovering") {
       if (this.On === undefined) {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
       } else {
@@ -864,7 +885,7 @@ export class Bot {
         }
       }
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Window Covering On: ${this.On}`);
-    } else if (this.device.bot?.deviceType === 'lock') {
+    } else if (this.device.bot?.deviceType === "lock") {
       if (this.On === undefined) {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
       } else {
@@ -877,20 +898,23 @@ export class Bot {
             this.platform.Characteristic.LockCurrentState,
             this.platform.Characteristic.LockCurrentState.UNSECURED,
           );
-          this.debugLog(`${this.device.deviceType}: `
-            + `${this.accessory.displayName} updateCharacteristic LockTargetState: UNSECURED, LockCurrentState: UNSECURED`);
+          this.debugLog(
+            `${this.device.deviceType}: ` +
+              `${this.accessory.displayName} updateCharacteristic LockTargetState: UNSECURED, LockCurrentState: UNSECURED`,
+          );
         } else {
           this.lockService?.updateCharacteristic(this.platform.Characteristic.LockTargetState, this.platform.Characteristic.LockTargetState.SECURED);
           this.lockService?.updateCharacteristic(
             this.platform.Characteristic.LockCurrentState,
             this.platform.Characteristic.LockCurrentState.SECURED,
           );
-          this.debugLog(`${this.device.deviceType}: `
-            + `${this.accessory.displayName} updateCharacteristic LockTargetState: SECURED, LockCurrentState: SECURED`);
+          this.debugLog(
+            `${this.device.deviceType}: ` + `${this.accessory.displayName} updateCharacteristic LockTargetState: SECURED, LockCurrentState: SECURED`,
+          );
         }
       }
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Lock On: ${this.On}`);
-    } else if (this.device.bot?.deviceType === 'faucet') {
+    } else if (this.device.bot?.deviceType === "faucet") {
       if (this.On === undefined) {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
       } else {
@@ -903,7 +927,7 @@ export class Bot {
         }
       }
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Faucet On: ${this.On}`);
-    } else if (this.device.bot?.deviceType === 'fan') {
+    } else if (this.device.bot?.deviceType === "fan") {
       if (this.On === undefined) {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
       } else {
@@ -916,7 +940,7 @@ export class Bot {
         }
       }
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Fan On: ${this.On}`);
-    } else if (this.device.bot?.deviceType === 'stateful') {
+    } else if (this.device.bot?.deviceType === "stateful") {
       if (this.On === undefined) {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
       } else {
@@ -926,20 +950,24 @@ export class Bot {
             this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS,
           );
           this.statefulProgrammableSwitchService?.updateCharacteristic(this.platform.Characteristic.ProgrammableSwitchOutputState, 1);
-          this.debugLog(`${this.device.deviceType}: `
-            + `${this.accessory.displayName} updateCharacteristic ProgrammableSwitchEvent: SINGLE, ProgrammableSwitchOutputState: 1`);
+          this.debugLog(
+            `${this.device.deviceType}: ` +
+              `${this.accessory.displayName} updateCharacteristic ProgrammableSwitchEvent: SINGLE, ProgrammableSwitchOutputState: 1`,
+          );
         } else {
           this.statefulProgrammableSwitchService?.updateCharacteristic(
             this.platform.Characteristic.ProgrammableSwitchEvent,
             this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS,
           );
           this.statefulProgrammableSwitchService?.updateCharacteristic(this.platform.Characteristic.ProgrammableSwitchOutputState, 0);
-          this.debugLog(`${this.device.deviceType}: `
-            + `${this.accessory.displayName} updateCharacteristic ProgrammableSwitchEvent: SINGLE, ProgrammableSwitchOutputState: 0`);
+          this.debugLog(
+            `${this.device.deviceType}: ` +
+              `${this.accessory.displayName} updateCharacteristic ProgrammableSwitchEvent: SINGLE, ProgrammableSwitchOutputState: 0`,
+          );
         }
       }
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} StatefulProgrammableSwitch On: ${this.On}`);
-    } else if (this.device.bot?.deviceType === 'switch') {
+    } else if (this.device.bot?.deviceType === "switch") {
       if (this.On === undefined) {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On: ${this.On}`);
       } else {
@@ -1083,15 +1111,15 @@ export class Bot {
   }
 
   async getCustomBLEAddress(switchbot: any) {
-    if (this.device.customBLEaddress && this.deviceLogging.includes('debug')) {
+    if (this.device.customBLEaddress && this.deviceLogging.includes("debug")) {
       (async () => {
         // Start to monitor advertisement packets
         await switchbot.startScan({
-          model: 'H',
+          model: "H",
         });
         // Set an event handler
         switchbot.onadvertisement = (ad: any) => {
-          this.warnLog(`${this.device.deviceType}: ${this.accessory.displayName} ad: ${JSON.stringify(ad, null, '  ')}`);
+          this.warnLog(`${this.device.deviceType}: ${this.accessory.displayName} ad: ${JSON.stringify(ad, null, "  ")}`);
         };
         await sleep(10000);
         // Stop to monitor
@@ -1101,7 +1129,7 @@ export class Bot {
   }
 
   async BLEPushConnection() {
-    if (this.platform.config.credentials?.token && this.device.connectionType === 'BLE/OpenAPI') {
+    if (this.platform.config.credentials?.token && this.device.connectionType === "BLE/OpenAPI") {
       this.warnLog(`${this.device.deviceType}: ${this.accessory.displayName} Using OpenAPI Connection to Push Changes`);
       await this.openAPIpushChanges();
     }
@@ -1109,7 +1137,7 @@ export class Bot {
 
   async BLERefreshConnection(switchbot: any): Promise<void> {
     this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} wasn't able to establish BLE Connection, node-switchbot: ${switchbot}`);
-    if (this.platform.config.credentials?.token && this.device.connectionType === 'BLE/OpenAPI') {
+    if (this.platform.config.credentials?.token && this.device.connectionType === "BLE/OpenAPI") {
       this.warnLog(`${this.device.deviceType}: ${this.accessory.displayName} Using OpenAPI Connection to Refresh Status`);
       await this.openAPIRefreshStatus();
     }
@@ -1137,17 +1165,17 @@ export class Bot {
 
   async PressOrSwitch(device: device & devicesConfig): Promise<void> {
     if (!device.bot?.mode) {
-      this.botMode = 'switch';
+      this.botMode = "switch";
       this.warnLog(`${this.device.deviceType}: ${this.accessory.displayName} does not have bot mode set in the Plugin's SwitchBot Device Settings,`);
       this.warnLog(`${this.device.deviceType}: ${this.accessory.displayName} is defaulting to "${this.botMode}" mode, you may experience issues.`);
-    } else if (device.bot?.mode === 'switch') {
-      this.botMode = 'switch';
+    } else if (device.bot?.mode === "switch") {
+      this.botMode = "switch";
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Using Bot Mode: ${this.botMode}`);
-    } else if (device.bot?.mode === 'press') {
-      this.botMode = 'press';
+    } else if (device.bot?.mode === "press") {
+      this.botMode = "press";
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Using Bot Mode: ${this.botMode}`);
-    } else if (device.bot?.mode === 'multipress') {
-      this.botMode = 'multipress';
+    } else if (device.bot?.mode === "multipress") {
+      this.botMode = "multipress";
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Using Bot Mode: ${this.botMode}`);
     } else {
       throw new Error(`${this.device.deviceType}: ${this.accessory.displayName} Bot Mode: ${this.botMode}`);
@@ -1193,14 +1221,16 @@ export class Bot {
         this.offlineOff();
         break;
       case 171:
-        this.errorLog(`${this.device.deviceType}: ${this.accessory.displayName} Hub Device is offline, statusCode: ${statusCode}. `
-          + `Hub: ${this.device.hubDeviceId}`);
+        this.errorLog(
+          `${this.device.deviceType}: ${this.accessory.displayName} Hub Device is offline, statusCode: ${statusCode}. ` +
+            `Hub: ${this.device.hubDeviceId}`,
+        );
         this.offlineOff();
         break;
       case 190:
         this.errorLog(
           `${this.device.deviceType}: ${this.accessory.displayName} Device internal error due to device states not synchronized with server,` +
-          ` Or command format is invalid, statusCode: ${statusCode}`,
+            ` Or command format is invalid, statusCode: ${statusCode}`,
         );
         break;
       case 100:
@@ -1210,8 +1240,10 @@ export class Bot {
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Request successful, statusCode: ${statusCode}`);
         break;
       default:
-        this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Unknown statusCode: `
-          + `${statusCode}, Submit Bugs Here: ' + 'https://tinyurl.com/SwitchBotBug`);
+        this.infoLog(
+          `${this.device.deviceType}: ${this.accessory.displayName} Unknown statusCode: ` +
+            `${statusCode}, Submit Bugs Here: ' + 'https://tinyurl.com/SwitchBotBug`,
+        );
     }
   }
 
@@ -1223,33 +1255,33 @@ export class Bot {
   }
 
   async apiError(e: any): Promise<void> {
-    if (this.device.bot?.deviceType === 'garagedoor') {
+    if (this.device.bot?.deviceType === "garagedoor") {
       this.garageDoorService?.updateCharacteristic(this.platform.Characteristic.TargetDoorState, e);
       this.garageDoorService?.updateCharacteristic(this.platform.Characteristic.CurrentDoorState, e);
       this.garageDoorService?.updateCharacteristic(this.platform.Characteristic.ObstructionDetected, e);
-    } else if (this.device.bot?.deviceType === 'door') {
+    } else if (this.device.bot?.deviceType === "door") {
       this.doorService?.updateCharacteristic(this.platform.Characteristic.TargetPosition, e);
       this.doorService?.updateCharacteristic(this.platform.Characteristic.CurrentPosition, e);
       this.doorService?.updateCharacteristic(this.platform.Characteristic.PositionState, e);
-    } else if (this.device.bot?.deviceType === 'window') {
+    } else if (this.device.bot?.deviceType === "window") {
       this.windowService?.updateCharacteristic(this.platform.Characteristic.TargetPosition, e);
       this.windowService?.updateCharacteristic(this.platform.Characteristic.CurrentPosition, e);
       this.windowService?.updateCharacteristic(this.platform.Characteristic.PositionState, e);
-    } else if (this.device.bot?.deviceType === 'windowcovering') {
+    } else if (this.device.bot?.deviceType === "windowcovering") {
       this.windowCoveringService?.updateCharacteristic(this.platform.Characteristic.TargetPosition, e);
       this.windowCoveringService?.updateCharacteristic(this.platform.Characteristic.CurrentPosition, e);
       this.windowCoveringService?.updateCharacteristic(this.platform.Characteristic.PositionState, e);
-    } else if (this.device.bot?.deviceType === 'lock') {
+    } else if (this.device.bot?.deviceType === "lock") {
       this.doorService?.updateCharacteristic(this.platform.Characteristic.LockTargetState, e);
       this.doorService?.updateCharacteristic(this.platform.Characteristic.LockCurrentState, e);
-    } else if (this.device.bot?.deviceType === 'faucet') {
+    } else if (this.device.bot?.deviceType === "faucet") {
       this.faucetService?.updateCharacteristic(this.platform.Characteristic.Active, e);
-    } else if (this.device.bot?.deviceType === 'fan') {
+    } else if (this.device.bot?.deviceType === "fan") {
       this.fanService?.updateCharacteristic(this.platform.Characteristic.On, e);
-    } else if (this.device.bot?.deviceType === 'stateful') {
+    } else if (this.device.bot?.deviceType === "stateful") {
       this.statefulProgrammableSwitchService?.updateCharacteristic(this.platform.Characteristic.ProgrammableSwitchEvent, e);
       this.statefulProgrammableSwitchService?.updateCharacteristic(this.platform.Characteristic.ProgrammableSwitchOutputState, e);
-    } else if (this.device.bot?.deviceType === 'switch') {
+    } else if (this.device.bot?.deviceType === "switch") {
       this.switchService?.updateCharacteristic(this.platform.Characteristic.On, e);
     } else {
       this.outletService?.updateCharacteristic(this.platform.Characteristic.On, e);
@@ -1262,8 +1294,9 @@ export class Bot {
 
   FirmwareRevision(accessory: PlatformAccessory<Context>, device: device & devicesConfig): CharacteristicValue {
     let FirmwareRevision: string;
-    this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName}`
-      + ` accessory.context.FirmwareRevision: ${accessory.context.FirmwareRevision}`);
+    this.debugLog(
+      `${this.device.deviceType}: ${this.accessory.displayName}` + ` accessory.context.FirmwareRevision: ${accessory.context.FirmwareRevision}`,
+    );
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} device.firmware: ${device.firmware}`);
     this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} this.platform.version: ${this.platform.version}`);
     if (accessory.context.FirmwareRevision) {
@@ -1320,25 +1353,25 @@ export class Bot {
       config = device.bot;
     }
     if (device.connectionType !== undefined) {
-      config['connectionType'] = device.connectionType;
+      config["connectionType"] = device.connectionType;
     }
     if (device.external !== undefined) {
-      config['external'] = device.external;
+      config["external"] = device.external;
     }
     if (device.logging !== undefined) {
-      config['logging'] = device.logging;
+      config["logging"] = device.logging;
     }
     if (device.refreshRate !== undefined) {
-      config['refreshRate'] = device.refreshRate;
+      config["refreshRate"] = device.refreshRate;
     }
     if (device.scanDuration !== undefined) {
-      config['scanDuration'] = device.scanDuration;
+      config["scanDuration"] = device.scanDuration;
     }
     if (device.offline !== undefined) {
-      config['offline'] = device.offline;
+      config["offline"] = device.offline;
     }
     if (device.maxRetry !== undefined) {
-      config['maxRetry'] = device.maxRetry;
+      config["maxRetry"] = device.maxRetry;
     }
     if (Object.entries(config).length !== 0) {
       this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Config: ${JSON.stringify(config)}`);
@@ -1347,7 +1380,7 @@ export class Bot {
 
   async logs(device: device & devicesConfig): Promise<void> {
     if (this.platform.debugMode) {
-      this.deviceLogging = this.accessory.context.logging = 'debugMode';
+      this.deviceLogging = this.accessory.context.logging = "debugMode";
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
     } else if (device.logging) {
       this.deviceLogging = this.accessory.context.logging = device.logging;
@@ -1356,7 +1389,7 @@ export class Bot {
       this.deviceLogging = this.accessory.context.logging = this.platform.config.options?.logging;
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Using Platform Config Logging: ${this.deviceLogging}`);
     } else {
-      this.deviceLogging = this.accessory.context.logging = 'standard';
+      this.deviceLogging = this.accessory.context.logging = "standard";
       this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} Logging Not Set, Using: ${this.deviceLogging}`);
     }
   }
@@ -1378,8 +1411,8 @@ export class Bot {
 
   debugWarnLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
-      if (this.deviceLogging?.includes('debug')) {
-        this.platform.log.warn('[DEBUG]', String(...log));
+      if (this.deviceLogging?.includes("debug")) {
+        this.platform.log.warn("[DEBUG]", String(...log));
       }
     }
   }
@@ -1392,16 +1425,16 @@ export class Bot {
 
   debugErrorLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
-      if (this.deviceLogging?.includes('debug')) {
-        this.platform.log.error('[DEBUG]', String(...log));
+      if (this.deviceLogging?.includes("debug")) {
+        this.platform.log.error("[DEBUG]", String(...log));
       }
     }
   }
 
   debugLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
-      if (this.deviceLogging === 'debug') {
-        this.platform.log.info('[DEBUG]', String(...log));
+      if (this.deviceLogging === "debug") {
+        this.platform.log.info("[DEBUG]", String(...log));
       } else {
         this.platform.log.debug(String(...log));
       }
@@ -1409,6 +1442,6 @@ export class Bot {
   }
 
   enablingDeviceLogging(): boolean {
-    return this.deviceLogging.includes('debug') || this.deviceLogging === 'standard';
+    return this.deviceLogging.includes("debug") || this.deviceLogging === "standard";
   }
 }

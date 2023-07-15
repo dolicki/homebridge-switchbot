@@ -1,9 +1,9 @@
 /// <reference types="node" />
-import { Context } from 'vm';
-import { Subject } from 'rxjs';
-import { SwitchBotPlatform } from '../platform';
-import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
-import { device, devicesConfig, deviceStatus, ad, serviceData, switchbot } from '../settings';
+import { Context } from "vm";
+import { Subject } from "rxjs";
+import { SwitchBotPlatform } from "../platform";
+import { Service, PlatformAccessory, CharacteristicValue } from "homebridge";
+import { device, devicesConfig, deviceStatus, ad, serviceData, switchbot } from "../settings";
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
@@ -27,15 +27,15 @@ export declare class Bot {
     On: CharacteristicValue;
     BatteryLevel: CharacteristicValue;
     StatusLowBattery: CharacteristicValue;
-    power: deviceStatus['power'];
+    power: deviceStatus["power"];
     deviceStatus: any;
     connected?: boolean;
     switchbot: switchbot;
     serviceData: serviceData;
-    address: ad['address'];
-    mode: serviceData['mode'];
-    state: serviceData['state'];
-    battery: serviceData['battery'];
+    address: ad["address"];
+    mode: serviceData["mode"];
+    state: serviceData["state"];
+    battery: serviceData["battery"];
     botMode: string;
     allowPush?: boolean;
     doublePress: number;
