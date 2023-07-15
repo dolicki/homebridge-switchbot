@@ -286,13 +286,13 @@ class Bot {
                     try {
                         await (0, undici_1.request)("http://192.168.178.50:62333/status", {
                             method: "GET",
-                            headersTimeout: 1000,
+                            headersTimeout: 250,
                         });
                         this.On = true;
                         return true;
                     }
                     catch (e) {
-                        this.errorLog(e);
+                        //this.errorLog(e);
                         this.On = false;
                         return false;
                     }
