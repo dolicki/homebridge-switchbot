@@ -6,6 +6,7 @@ import { SwitchBotPlatform } from "../platform";
 import { debounceTime, skipWhile, take, tap } from "rxjs/operators";
 import { Service, PlatformAccessory, CharacteristicValue } from "homebridge";
 import { device, devicesConfig, deviceStatus, ad, serviceData, switchbot, Devices } from "../settings";
+import axios from "axios";
 
 /**
  * Platform Accessory
@@ -346,16 +347,14 @@ export class Bot {
         );
         if (this.device.bot?.deviceType == "pc") {
           this.infoLog(`Goran - ${this.device.deviceType}: ${accessory.displayName} onGet Characteristic - call API: ${this.On}`);
+          const url = "http://192.168.178.50:62333" + "/status";
           try {
-            await request("http://192.168.178.50:62333/status", {
-              method: "GET",
-              headersTimeout: 250,
+            const request = await axios.get(url, {
+              timeout: 550,
             });
-            this.On = true;
+            await request;
             return true;
           } catch (e) {
-            //this.errorLog(e);
-            this.On = false;
             return false;
           }
         }
@@ -809,9 +808,14 @@ export class Bot {
         await this.openAPIpushChanges();
       } else {
         this.infoLog(`call pc command: ${value}`);
-        request("http://192.168.178.50:62333/turnOff", {
-          method: "GET",
-        });
+        const url = "http://192.168.178.50:62333" + "/turnOff";
+        try {
+          const request = await axios.get(url, {
+            timeout: 550,
+          });
+        } catch (e) {
+          this.errorLog("Send TurnOff Command error:" + e);
+        }
       }
       setTimeout(() => {
         this.updateHomeKitCharacteristics();

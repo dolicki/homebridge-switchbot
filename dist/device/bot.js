@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Bot = void 0;
 const undici_1 = require("undici");
@@ -6,6 +9,7 @@ const utils_1 = require("../utils");
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const settings_1 = require("../settings");
+const axios_1 = __importDefault(require("axios"));
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
@@ -283,17 +287,15 @@ class Bot {
                 this.infoLog(`Goran - his.device.bot?.deviceType = ${this.device.bot?.deviceType}: ${accessory.displayName} onGet Characteristic: ${this.On}`);
                 if (this.device.bot?.deviceType == "pc") {
                     this.infoLog(`Goran - ${this.device.deviceType}: ${accessory.displayName} onGet Characteristic - call API: ${this.On}`);
+                    const url = "http://192.168.178.50:62333" + "/status";
                     try {
-                        await (0, undici_1.request)("http://192.168.178.50:62333/status", {
-                            method: "GET",
-                            headersTimeout: 250,
+                        const request = await axios_1.default.get(url, {
+                            timeout: 550,
                         });
-                        this.On = true;
+                        await request;
                         return true;
                     }
                     catch (e) {
-                        //this.errorLog(e);
-                        this.On = false;
                         return false;
                     }
                 }
@@ -739,9 +741,15 @@ class Bot {
             }
             else {
                 this.infoLog(`call pc command: ${value}`);
-                (0, undici_1.request)("http://192.168.178.50:62333/turnOff", {
-                    method: "GET",
-                });
+                const url = "http://192.168.178.50:62333" + "/turnOff";
+                try {
+                    const request = await axios_1.default.get(url, {
+                        timeout: 550,
+                    });
+                }
+                catch (e) {
+                    this.errorLog("Send TurnOff Command error:" + e);
+                }
             }
             setTimeout(() => {
                 this.updateHomeKitCharacteristics();
