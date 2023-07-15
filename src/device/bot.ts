@@ -352,7 +352,6 @@ export class Bot {
             const request = await axios.get(url, {
               timeout: 550,
             });
-            await request;
             return true;
           } catch (e) {
             return false;
@@ -802,10 +801,10 @@ export class Bot {
       }
     } else if (this.device.bot?.deviceType == "pc") {
       this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set PC status to: ${value}`);
-      this.On = value;
       if (value == true) {
         this.infoLog(`call api - value: ${value}`);
         await this.openAPIpushChanges();
+        this.On = false;
       } else {
         this.infoLog(`call pc command: ${value}`);
         const url = "http://192.168.178.50:62333" + "/turnOff";
@@ -815,6 +814,7 @@ export class Bot {
           });
         } catch (e) {
           this.errorLog("Send TurnOff Command error:" + e);
+          this.On = true;
         }
       }
       setTimeout(() => {
