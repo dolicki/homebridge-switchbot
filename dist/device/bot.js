@@ -279,7 +279,7 @@ class Bot {
             }
             this.outletService.getCharacteristic(this.platform.Characteristic.On).onSet(this.OnSet.bind(this));
             this.outletService.getCharacteristic(this.platform.Characteristic.On).onGet(() => {
-                this.infoLog(`${this.device.deviceType}: ${accessory.displayName} onGet Characteristic: ${this.On}`);
+                //this.infoLog(`${this.device.deviceType}: ${accessory.displayName} onGet Characteristic: ${this.On}`);
                 return false;
             });
         }
@@ -722,7 +722,9 @@ class Bot {
                 }
             }
             this.On = value;
-            this.updateHomeKitCharacteristics();
+            setTimeout(() => {
+                this.updateHomeKitCharacteristics();
+            }, 3000);
         }
         //this.doBotUpdate.next();
     }
