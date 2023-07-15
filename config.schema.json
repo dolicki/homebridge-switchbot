@@ -295,6 +295,10 @@
                         {
                           "title": "Switch",
                           "enum": ["switch"]
+                        },
+                        {
+                          "title": "PC",
+                          "enum": ["pc"]
                         }
                       ],
                       "placeholder": "outlet",

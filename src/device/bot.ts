@@ -341,6 +341,10 @@ export class Bot {
       this.outletService.getCharacteristic(this.platform.Characteristic.On).onSet(this.OnSet.bind(this));
       this.outletService.getCharacteristic(this.platform.Characteristic.On).onGet(() => {
         //this.infoLog(`${this.device.deviceType}: ${accessory.displayName} onGet Characteristic: ${this.On}`);
+        this.infoLog(`Goran - ${this.device.deviceType}: ${accessory.displayName} onGet Characteristic: ${this.On}`);
+        if (this.device.deviceType == "pc") {
+          return this.On;
+        }
         return false;
       });
     }
@@ -783,6 +787,19 @@ export class Bot {
       } else {
         this.On = true;
       }
+    } else if (this.device.bot?.deviceType == "pc") {
+      this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set PC status to: ${value}`);
+      this.On = value;
+      if (value == true) {
+        this.infoLog(`call api - value: ${value}`);
+      } else {
+        this.infoLog(`call pc command: ${value}`);
+      }
+
+      setTimeout(() => {
+        this.updateHomeKitCharacteristics();
+      }, 1000);
+      return;
     } else {
       this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set On: ${value}`);
       if (this.device.bot?.mode === "multipress") {
@@ -796,7 +813,7 @@ export class Bot {
         this.updateHomeKitCharacteristics();
       }, 1000);
     }
-    this.doBotUpdate.next();
+    //this.doBotUpdate.next();
   }
 
   /**
@@ -979,6 +996,12 @@ export class Bot {
       } else {
         this.switchService?.updateCharacteristic(this.platform.Characteristic.On, this.On);
         this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} updateCharacteristic On: ${this.On}`);
+      }
+    } else if (this.device.bot?.deviceType === "pc") {
+      if (this.On === undefined) {
+        this.debugLog(`${this.device.deviceType}: ${this.accessory.displayName} On (undefined - PC): ${this.On}`);
+      } else {
+        this.outletService?.updateCharacteristic(this.platform.Characteristic.On, this.On);
       }
     } else {
       if (this.On === undefined) {
