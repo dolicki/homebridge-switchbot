@@ -290,11 +290,13 @@ class Bot {
                     const url = "http://192.168.178.50:62333" + "/status";
                     try {
                         const request = await axios_1.default.get(url, {
-                            timeout: 550,
+                            timeout: 1000,
                         });
+                        this.On = true;
                         return true;
                     }
                     catch (e) {
+                        this.On = false;
                         return false;
                     }
                 }
