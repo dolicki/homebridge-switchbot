@@ -701,6 +701,10 @@ export class Bot {
       this.debugLog(`${this.device.deviceType}: ${this.multiPressCount} request(s) queued.`);
       this.On = true;
     }
+    this.debugLog(
+      `${this.device.deviceType}: ${this.accessory.displayName} - mode: ${this.botMode} openAPIpushChanges` +
+        ` - this.On (${this.On}) !== this.accessory.context.On (${this.accessory.context.On})`,
+    );
     if (this.On !== this.accessory.context.On || this.allowPush || this.multiPressCount > 0) {
       let command = "";
       if (this.botMode === "switch" && this.On) {
@@ -805,8 +809,8 @@ export class Bot {
       this.infoLog(`${this.device.deviceType}: ${this.accessory.displayName} Set PC status to: ${value}`);
       if (value == true) {
         this.infoLog(`call api - value: ${value}`);
+        this.On = value;
         await this.openAPIpushChanges();
-        this.On = false;
       } else {
         this.infoLog(`call pc command: ${value}`);
         const url = "http://192.168.178.50:62333" + "/turnOff";
